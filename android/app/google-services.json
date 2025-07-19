@@ -1,0 +1,91 @@
+{
+  "project_info": {
+    "project_number": "541121367131",
+    "firebase_url": "https://device-doctors-7ecff-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "device-doctors-7ecff",
+    "storage_bucket": "device-doctors-7ecff.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:541121367131:android:9887427fe17c013704437e",
+        "android_client_info": {
+          "package_name": "com.deviceDoctorsTech"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "541121367131-kk1jl2v61hdcoru4o9hlau17bh60pjre.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3qbc8oV7AdfZmppcu4GLLbqzqefDW2p4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "541121367131-kk1jl2v61hdcoru4o9hlau17bh60pjre.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "541121367131-522rpv79p5c2e724755iumsmr3cm2ivc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.devicedoctor.user"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:541121367131:android:446bc5feec4deafe04437e",
+        "android_client_info": {
+          "package_name": "com.devicedoctor.user"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "541121367131-qinfekbes7nc0ui40ob8nc732pe38gtn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.devicedoctor.user",
+            "certificate_hash": "781c2122228cec552466750164208ac04d92e3a1"
+          }
+        },
+        {
+          "client_id": "541121367131-kk1jl2v61hdcoru4o9hlau17bh60pjre.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3qbc8oV7AdfZmppcu4GLLbqzqefDW2p4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "541121367131-kk1jl2v61hdcoru4o9hlau17bh60pjre.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "541121367131-522rpv79p5c2e724755iumsmr3cm2ivc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.devicedoctor.user"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
