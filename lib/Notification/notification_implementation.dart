@@ -12,7 +12,7 @@ import 'firebase_messaging/background_notification.dart';
 import 'uuid.dart';
 
 // Define channel keys
-const String _messageKey = 'message';
+const String _sound = 'buzzer_channel';
 const String _normal = 'normal';
 
 /// A class to implement notification functionalities.
@@ -39,7 +39,7 @@ class NotificationImplementation {
       awesomeChannelService.createChannel(
         soundSource: awesomeChannelService.sound,
         criticalAlerts: true,
-        channelKey: _messageKey,
+        channelKey: _sound,
         channelName: "Warning Notifications",
         channelDescription: "Notification for new orders.",
         ledColor: Colors.green,
@@ -50,6 +50,7 @@ class NotificationImplementation {
         defaultRingtoneType: DefaultRingtoneType.Notification,
         onlyAlertOnce: true,
         groupKey: 'warning_group',
+          playSound:true,
       ),
       awesomeChannelService.createChannel(
         criticalAlerts: true,
@@ -62,6 +63,7 @@ class NotificationImplementation {
         channelShowBadge: true,
         defaultRingtoneType: DefaultRingtoneType.Notification,
         groupKey: 'normal_group',
+        playSound: false,
       ),
     ];
   }
@@ -81,7 +83,10 @@ class NotificationImplementation {
 }
 
 showNotification(Map<String, dynamic> data, {bool isBackGround = false}) {
-  if (data['android_channel_id'] == _messageKey) {
+  print('<++++++++++++++++++++++++++++++++++++++++++++++>');
+  print('<++++++++++++++++++++++++++++++++++++++++++++++>');
+  print(data);
+  if (data['android_channel_id'] == _sound) {
     viewScreen(
         id: data['android_channel_id'],  );
     Map<String, String?>? payload = data.map((key, value) {
@@ -91,11 +96,12 @@ showNotification(Map<String, dynamic> data, {bool isBackGround = false}) {
         title: data['title'],
         body: data['body'],
         bigPicture: data['image'],
-        channelKey: _messageKey,
+        channelKey: _sound,
         notificationLayout: NotificationLayout.Default,
         uid: generateSSID(),
         payload: payload);
   } else {
+    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     AwesomeNotificationService().createNotification(
         title: data['title'],
         body: data['body'],

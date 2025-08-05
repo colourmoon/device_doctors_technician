@@ -17,13 +17,14 @@ import 'create_qoute_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ReviewQuoteScreen extends StatelessWidget {
-  final String orderId, serviceId, total, type;
+  final String orderId, serviceId, total, type,paymentMode;
 
   const ReviewQuoteScreen(
       {super.key,
       required this.orderId,
       required this.serviceId,
       required this.total,
+      required this.paymentMode,
       this.type = ""});
 
   @override
@@ -354,7 +355,7 @@ class ReviewQuoteScreen extends StatelessWidget {
                         serviceItems: ServiceItems,
                         orderId: orderId,
                         serviceId: serviceId,
-                        totalamount: totalAmount,
+                        totalamount: totalAmount, paymentMode:  paymentMode,
                       ),
                     ));
               },

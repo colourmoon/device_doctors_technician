@@ -1,7 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -10,6 +14,10 @@ import 'package:device_doctors_technician/Service_professional/commons/common_te
 import 'package:device_doctors_technician/Service_professional/commons/shimmer_widgets/common_loading_widgets.dart';
 import 'package:device_doctors_technician/Service_professional/services_home/service_details/model/service_details_model.dart';
 
+import '../../../../comman/Api/Base-Api.dart';
+import '../../../../comman/Api/end_points.dart';
+import '../../../../comman/env.dart';
+import '../../../../utility/auth_shared_pref.dart';
 import '../../../../utility/themeToast.dart';
 import '../../../../widget/CustomWidget/DottedLinePainter.dart';
 import '../../../commons/common_button_widget.dart';
@@ -25,6 +33,7 @@ import '../widget/service_details_widget.dart';
 // import 'package:swipe_button_widget/swipe_button_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../widget/success_sheet_widget.dart';
 import 'create_qoute_screen.dart';
 import 'review_quote_screen.dart';
 
@@ -164,9 +173,9 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                             .read<NewOrdersCubit>()
                             .fetchNewOrders(type: "new");
                       } else if (newstate.newOrder == null) {
-                        Navigator.pop(context);
+                        Navigator.maybePop(context);
                       } else if (newstate.newOrder!.isNotEmpty) {
-                        Navigator.pop(context);
+                        Navigator.maybePop(context);
                       }
                       // TODO: implement listener
                     },
@@ -213,7 +222,8 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                   ),
 
                 if (widget.orderStatus == "START SERVICE" &&
-                    serviceDetails.is_amc_subscription == 'yes' )
+                    serviceDetails.is_amc_subscription == 'yes' &&
+                    serviceDetails.visitAndQuote.isEmpty)
                   TextButton(
                       onPressed: () {
                         String? serviceId;
@@ -230,7 +240,9 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                               builder: (context) => CreateQuoteScreen(
                                 serviceItems: [],
                                 orderId: widget.orderId,
-                                serviceId: serviceId ?? serviceDetails.serviceItems.first.id,
+                                paymentMode: state.serviceDetails?.paymentMode ?? "",
+                                serviceId: serviceId ??
+                                    serviceDetails.serviceItems.first.id,
                                 totalamount: '',
                               ),
                             ));
@@ -271,7 +283,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                   type: "details",
                                   total: serviceDetails.visitAndQuotePrice,
                                   orderId: serviceDetails.id,
-                                  serviceId: serviceId ?? "",
+                                  serviceId: serviceId ?? "", paymentMode:  state.serviceDetails?.paymentMode ?? "",
                                 ),
                               ));
                           // bottomSheet();
@@ -283,7 +295,19 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                             completeServiceBottomSheet(
                                 servicecubit:
                                     context.read<ServiceDetailsCubit>(),
-                                context: context);
+                                success: () {
+                                  print('⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙2');
+                                  successSheet(context,() {
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      CupertinoPageRoute(
+                                        builder: (_) => const ServicesBottomBarScreen(initialIndex: 1),
+                                      ),
+                                          (route) => false,
+                                    );
+                                  },);
+                                },
+                                gcontext: context, paymentMode: state.serviceDetails?.paymentMode ?? "");
                           },
                           child: CommonProximaNovaTextWidget(
                             text: buttonName,
@@ -312,7 +336,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                   orderId: serviceDetails.id,
                                   serviceId: serviceId ?? "",
                                   serviceItems: [],
-                                  totalamount: "",
+                                  totalamount: "", paymentMode: state.serviceDetails?.paymentMode ?? "",
                                 ),
                               ));
                           // bottomSheet();
@@ -321,10 +345,25 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       ),
                       TextButton(
                           onPressed: () {
+
+
                             completeServiceBottomSheet(
                                 servicecubit:
                                     context.read<ServiceDetailsCubit>(),
-                                context: context);
+                                success: () {
+
+                                  print('⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙3');
+                                  successSheet(context,() {
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      CupertinoPageRoute(
+                                        builder: (_) => const ServicesBottomBarScreen(initialIndex: 1),
+                                      ),
+                                          (route) => false,
+                                    );
+                                  },);
+                                },
+                                gcontext: context, paymentMode: '');
                           },
                           child: CommonProximaNovaTextWidget(
                             text: buttonName,
@@ -339,11 +378,34 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                   SwipeButtons(
                     isLoading: state.isStatusLoading,
                     onButtonDragged: () {
-                      completeService(context.read<ServiceDetailsCubit>(),
-                          isRecivedPayment:
-                              serviceDetails.is_pay_after_service == 'yes');
+                      completeService(
+
+                        context.read<ServiceDetailsCubit>(),
+                        isRecivedPayment:
+                            serviceDetails.is_pay_after_service == 'yes',
+                        orderId: state.serviceDetails?.orderId ?? "",
+                        visitAndQuotePrice: state.serviceDetails?.isQuote ?? "",
+                        paymentMode: state.serviceDetails?.paymentMode ?? "",
+                      );
                     },
                     buttontitle: "COMPLETE SERVICE",
+                  ),
+                if (serviceDetails.isQuote == '1' &&
+                    (state.serviceDetails?.paymentType ?? "") == 'Pending' &&
+                    (state.serviceDetails?.is_pay_after_service ?? "") ==
+                        'yes' &&
+                    (widget.orderStatus.toLowerCase() ?? "") == 'completed')
+                  SwipeButtons(
+                    isLoading: state.isStatusLoading,
+                    onButtonDragged: () {
+                      recivedPayment(
+                        orderId: state.serviceDetails?.orderId ?? "",
+                        showDropDown: true,
+                        context: context,
+                      );
+                    },
+                    fontSize: 10,
+                    buttontitle: "RECEIVED PAYMENT MARK AS COMPLETE",
                   ),
                 if (widget.orderStatus == "COMPLETE")
                   const SizedBox(
@@ -373,16 +435,16 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       ),
                     ),
                   ),
-                if (widget.orderStatus == "completed")
-                  CompleteOrderEarningsWidget(
-                    price: serviceDetails.earnings,
-                    // ((double.tryParse(state.serviceDetails!.subTotal) ??
-                    //             0) +(double.tryParse(state.serviceDetails!.tip) ??
-                    //             0)+
-                    //         double.parse(
-                    //             state.serviceDetails!.visitAndQuotePrice))
-                    //     .toString()),
-                  ),
+                // if (widget.orderStatus == "completed")
+                //   CompleteOrderEarningsWidget(
+                //     price: serviceDetails.earnings,
+                //     // ((double.tryParse(state.serviceDetails!.subTotal) ??
+                //     //             0) +(double.tryParse(state.serviceDetails!.tip) ??
+                //     //             0)+
+                //     //         double.parse(
+                //     //             state.serviceDetails!.visitAndQuotePrice))
+                //     //     .toString()),
+                //   ),
                 10.ph,
               ],
             ),
@@ -390,6 +452,13 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
               child: Column(
                 children: [
                   ServiceDetailsFullDetailsWidget(
+                    is_quote: serviceDetails.isQuote,
+                    sub_total: serviceDetails.sub_total ??"",
+                    taxPercentage: serviceDetails.taxPercentage ??"",
+                    payment_mode: serviceDetails.paymentMode ??"",
+                    grand_total: serviceDetails.grandTotal ??"",
+                    wallet_part_payment: serviceDetails.wallet_part_payment ??'',
+                    billDetails:serviceDetails.billDetails,
                     couponCode: serviceDetails.couponcode,
                     tipAmount: serviceDetails.tip,
                     visitnquotetotal: serviceDetails.visitAndQuotePrice,
@@ -581,7 +650,10 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
   }
 
   completeService(ServiceDetailsCubit servicecubit,
-      {bool isRecivedPayment = false}) {
+      {bool isRecivedPayment = false,
+      required String orderId,
+      required String visitAndQuotePrice,
+      required String paymentMode}) {
     return showModalBottomSheet<void>(
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -599,80 +671,27 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                   listener: (context, newstate) {
                     if (newstate.reachedSuccesss == 'success') {
                       if (isRecivedPayment) {
-                        showModalBottomSheet<void>(
-                          shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(15),
-                                  topRight: Radius.circular(15))),
-                          // isScrollControlled: true,
+                        recivedPayment(
+                          orderId: orderId,
                           context: context,
-                          builder: (BuildContext context) {
-                            return SingleChildScrollView(
-                              child: AnimatedPadding(
-                                  padding: MediaQuery.of(context).viewInsets,
-                                  duration: const Duration(milliseconds: 100),
-                                  curve: Curves.decelerate,
-                                  child: StatefulBuilder(
-                                      builder: ((context, setState) {
-                                    return Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        const SizedBox(
-                                          height: 32,
-                                        ),
-                                        SvgPicture.string(
-                                          pinToStart,
-                                          height: 107,
-                                        ),
-                                        const Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 60),
-                                          child: CommonProximaNovaTextWidget(
-                                              text:
-                                                  "Tell to Customer to complete the Payment so that Service will be Mark as Completed",
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
-                                              color: Color(0xff000000),
-                                              textAlign: TextAlign.center),
-                                        ),
-                                        15.ph,
-                                        SwipeButtons(
-                                          onButtonDragged: () {
-
-                                            Navigator.pushAndRemoveUntil(
-                                              context,
-                                              CupertinoPageRoute(
-                                                  builder: (context) =>
-                                                      const ServicesBottomBarScreen(
-                                                        initialIndex: 1,
-                                                      )),
-                                              (route) => false,
-                                            );
-                                            // Navigator.pop(context);
-                                            // Navigator.pop(context);
-                                          },
-                                          buttontitle:
-                                              "RECIVED PAYMENT & MARK COMPLETE",
-                                          fontSize: 10,
-                                        ),
-                                        10.ph,
-                                      ],
-                                    );
-                                  }))),
-                            );
-                          },
+                        );
+                      } else if (paymentMode == 'COD' &&
+                          visitAndQuotePrice == '0' &&
+                          newstate.reachedSuccesss == 'success') {
+                        recivedPayment(
+                          orderId: orderId,
+                          showDropDown: false,
+                          context: context,
                         );
                       } else {
                         Navigator.pushAndRemoveUntil(
                           context,
                           CupertinoPageRoute(
                               builder: (context) =>
-                              const ServicesBottomBarScreen(
-                                initialIndex: 1,
-                              )),
-                              (route) => false,
+                                  const ServicesBottomBarScreen(
+                                    initialIndex: 1,
+                                  )),
+                          (route) => false,
                         );
                       }
                     }
@@ -783,6 +802,17 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                           .state.serviceDetails?.orderId ??
                                       "",
                                   otp: submitOtp(),
+                                  context: context,
+                                  success: () {
+                                    if(paymentMode =='COD') {
+                                      recivedPayment(
+                                        orderId:
+                                        state.serviceDetails?.orderId ?? "",
+                                        context: context,
+                                        showDropDown: false,
+                                      );
+                                    }
+                                  },
                                 );
                           },
                           buttontitle: "Complete NOW",
@@ -798,16 +828,144 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
     );
   }
 
+    recivedPayment({
+    required String orderId,
+    bool showDropDown = true,
+    required BuildContext context,
+  }) {
+    final repo = OrderPaymentRepository();
+    String? _selected;
+    print('=!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+      showModalBottomSheet<void>(
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+      // isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: AnimatedPadding(
+              padding: MediaQuery.of(context).viewInsets,
+              duration: const Duration(milliseconds: 100),
+              curve: Curves.decelerate,
+              child: StatefulBuilder(builder: ((context, setState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(
+                      height: 32,
+                    ),
+                    SvgPicture.string(
+                      pinToStart,
+                      height: 107,
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 60),
+                      child: CommonProximaNovaTextWidget(
+                          text:
+                              "Tell to Customer to complete the Payment so that Service will be Mark as Completed",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff000000),
+                          textAlign: TextAlign.center),
+                    ),
+                    15.ph,
+                    if (showDropDown)
+                      IntrinsicWidth(
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            border: OutlineInputBorder(),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              isDense: true,
+                              value: _selected,
+                              hint: Text("Pay via"),
+                              items: const [
+                                DropdownMenuItem(
+                                    value: "cash", child: Text("Cash")),
+                                DropdownMenuItem(
+                                    value: "online", child: Text("Online")),
+                              ],
+                              onChanged: (val) {
+                                setState(() => _selected = val);
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    15.ph,
+                    ValueListenableBuilder(
+                      builder: (context, value, child) => value
+                          ? const CircularProgressIndicator(
+                              color: Colors.black,
+                            )
+                          : SwipeButtons(
+                              onButtonDragged: () async {
+                                if (!showDropDown) {
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (context) =>
+                                          const ServicesBottomBarScreen(
+                                              initialIndex: 1),
+                                    ),
+                                    (route) => false,
+                                  );
+                                }
+                                if (_selected == null) {
+                                  Fluttertoast.showToast(
+                                      msg: 'Please Select Payment Method');
+                                  return;
+                                }
+                                bool result =
+                                    await repo.completePayAfterService(
+                                  context: context,
+                                  accessToken: (Constants.prefs?.getString(
+                                              "provider_access_token") ??
+                                          '')
+                                      .trim(),
+                                  orderId: orderId.trim(),
+                                  paymentType: _selected ?? '',
+                                );
+
+                                if (result) {
+                                  print(
+                                      "Payment successfully marked as complete.");
+                                } else {
+                                  print("Payment marking failed.");
+                                }
+                                // Navigator.pop(context);
+                                // Navigator.pop(context);
+                              },
+                              buttontitle: "RECIVED PAYMENT & MARK COMPLETE",
+                              fontSize: 10,
+                            ),
+                      valueListenable: repo.markCompleteNotifier,
+                    ),
+                    10.ph,
+                  ],
+                );
+              }))),
+        );
+      },
+    );
+  }
+
   static completeServiceBottomSheet(
       {required ServiceDetailsCubit servicecubit,
-      required BuildContext context}) {
+        required String paymentMode,
+        required Function() success,
+      required BuildContext gcontext}) {
     List<String> options = [
       'Client changes Mind No Service Required',
       'Expecting Low Cost',
       'He got Better offer ',
       "No Reason Given"
     ];
-    String? selectedOption;
     return showModalBottomSheet(
         backgroundColor: Colors.transparent,
         enableDrag: true,
@@ -818,7 +976,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
               topRight: Radius.circular(20),
             ),
             borderSide: BorderSide.none),
-        context: context,
+        context: gcontext,
         builder: (context) {
           return BlocBuilder<ServiceDetailsCubit, ServiceDetailsState>(
             bloc: servicecubit,
@@ -913,12 +1071,33 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                               titlecolor: AppthemeColor().whiteColor,
                               buttonColor: AppthemeColor().themecolor,
                               boardercolor: AppthemeColor().themecolor,
-                              buttonOnTap: () {
-                                Navigator.pop(context);
-                                servicecubit.completeOrder(
-                                    reason: state.selectedOption!,
-                                    orderId: state.serviceDetails!.orderId,
-                                    otp: '');
+                              buttonOnTap: ()  {
+
+                                 servicecubit.completeOrder(
+                                  reason: state.selectedOption!,
+                                  orderId: state.serviceDetails!.orderId,
+                                  otp: '',
+                                  context: context,
+                                  success: ()   {
+                                    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                                    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                                    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                                    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                                    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                                    print('${state.serviceDetails?.paymentMode ?? ""}');
+        if( (state.serviceDetails?.paymentMode ?? "").toLowerCase() == 'cod') {
+          success.call();
+
+          print('___________________________________');
+          // Navigator.pop(context);
+
+
+        }else{
+          Navigator.pop(context);
+        }
+
+                                  },
+                                );
                               },
                             ),
                           ),
@@ -1342,3 +1521,23 @@ const pinToStart = """
 <path d="M53.2413 65.5658V70.9842H32.9123V37.0159H53.2413V42.4343H55.5613V36.6679V32.8683C55.5611 32.3198 55.3432 31.7938 54.9553 31.406C54.5675 31.0182 54.0415 30.8002 53.493 30.8H32.6606C32.1121 30.8002 31.5861 31.0182 31.1982 31.406C30.8104 31.7938 30.5924 32.3198 30.5923 32.8683V36.6679V71.2939V75.1347C30.5932 75.6827 30.8115 76.2079 31.1993 76.5951C31.587 76.9823 32.1126 77.1999 32.6606 77.2001H53.493C54.0415 77.1999 54.5675 76.9819 54.9553 76.5941C55.3432 76.2062 55.5611 75.6803 55.5613 75.1318V71.291V65.5658H53.2413ZM40.784 33.3283H45.3695C45.5234 33.3283 45.6709 33.3894 45.7796 33.4981C45.8884 33.6069 45.9495 33.7544 45.9495 33.9083C45.9495 34.0621 45.8884 34.2096 45.7796 34.3184C45.6709 34.4272 45.5234 34.4883 45.3695 34.4883H40.784C40.6302 34.4883 40.4827 34.4272 40.3739 34.3184C40.2652 34.2096 40.204 34.0621 40.204 33.9083C40.204 33.7544 40.2652 33.6069 40.3739 33.4981C40.4827 33.3894 40.6302 33.3283 40.784 33.3283ZM46.8224 74.6718H39.3311C39.1773 74.6718 39.0298 74.6107 38.921 74.502C38.8123 74.3932 38.7511 74.2457 38.7511 74.0918C38.7511 73.938 38.8123 73.7905 38.921 73.6817C39.0298 73.5729 39.1773 73.5118 39.3311 73.5118H46.8224C46.9763 73.5118 47.1238 73.5729 47.2325 73.6817C47.3413 73.7905 47.4024 73.938 47.4024 74.0918C47.4024 74.2457 47.3413 74.3932 47.2325 74.502C47.1238 74.6107 46.9763 74.6718 46.8224 74.6718Z" fill="#223DFE"/>
 </svg>
 """;
+
+Future successSheet(BuildContext context,Function() onSwipeComplete) async{
+  await Future.delayed(Durations.extralong4);
+ return showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(15),
+        topRight: Radius.circular(15),
+      ),
+    ),
+    builder: (_) => SuccessSheetWidget(
+      onSwipeComplete: () {
+        onSwipeComplete.call();
+
+      },
+    ),
+  );
+}

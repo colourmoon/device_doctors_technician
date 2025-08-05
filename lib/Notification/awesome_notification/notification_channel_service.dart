@@ -53,6 +53,8 @@ class AwesomeChannelService {
     bool criticalAlerts = false,
     bool channelShowBadge = true,
     bool locked = false,
+    bool playSound= false,
+
     bool onlyAlertOnce = true,
   }) {
     return NotificationChannel(
@@ -67,6 +69,7 @@ class AwesomeChannelService {
       channelShowBadge: channelShowBadge,
       icon: notificationIcon,
       locked: locked,
+      playSound: playSound ,
       onlyAlertOnce: onlyAlertOnce,
       groupKey: groupKey,
       defaultRingtoneType: defaultRingtoneType,

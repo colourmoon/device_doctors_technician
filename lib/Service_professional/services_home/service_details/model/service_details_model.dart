@@ -21,6 +21,8 @@ class ServiceDetailsModel {
   String grandTotal;
   String serviceDate;
   String serviceTime;
+
+  BillDetails? billDetails;
   String customerName;
   String customerMobile;
   String customerAddress;
@@ -42,6 +44,9 @@ class ServiceDetailsModel {
   String custLongitude;
   String isQuote;
   String? device_brand;
+  String? sub_total;
+  String? taxPercentage;
+  String? wallet_part_payment;
   String? model_name;
   String? serial_number;
   String? is_vendor_update_device_details;
@@ -62,12 +67,14 @@ class ServiceDetailsModel {
     required this.id,
     required this.sessionId,
     required this.device_brand,
+    required this.wallet_part_payment,
     required this.complaint,
     required this.device_type,
     required this.service_name,
     required this.model_name,
     required this.serial_number,
     required this.device_model_name,
+    required this.taxPercentage,
     required this.is_amc_subscription,
     required this.is_vendor_update_device_details,
     required this.subTotal,
@@ -78,6 +85,8 @@ class ServiceDetailsModel {
     required this.quotationDate,
     required this.completedDate,
     required this.serviceTime,
+    required this.billDetails,
+    required this.sub_total,
     required this.earnings,
     required this.customerName,
     required this.customerMobile,
@@ -105,13 +114,20 @@ class ServiceDetailsModel {
   factory ServiceDetailsModel.fromJson(Map<String, dynamic> json) =>
       ServiceDetailsModel(
         orderId: json["order_id"],
+        taxPercentage: json["tax_percentage"],
         complaint: json["complaint"],
-        is_vendor_update_device_details: json["is_vendor_update_device_details"],
+        is_vendor_update_device_details:
+            json["is_vendor_update_device_details"],
         device_type: json["device_type"],
         device_id: json["device_id"],
+        wallet_part_payment: json["wallet_part_payment"],
+        billDetails: json['bill_details'] != null
+            ? new BillDetails.fromJson(json['bill_details'])
+            : null,
         serial_number: json["serial_number"],
         is_amc_subscription: json["is_amc_subscription"],
         model_name: json["model_name"],
+        sub_total: json["sub_total"],
         device_model_name: json["device_model_name"],
         device_brand: json["device_brand"],
         id: json["id"],
@@ -140,7 +156,7 @@ class ServiceDetailsModel {
         custLatitude: json["cust_latitude"],
         custLongitude: json["cust_longitude"],
         isQuote: json["isQuote"],
-        service_name: json["service_name"] ??'',
+        service_name: json["service_name"] ?? '',
         status: json["status"],
         serviceItems: List<ServiceItem>.from(
             json["service_items"].map((x) => ServiceItem.fromJson(x))),
@@ -163,6 +179,9 @@ class ServiceDetailsModel {
         "service_name": service_name,
         "service_date": serviceDate,
         "device_type": device_type,
+
+        "tax_percentage": taxPercentage,
+        "sub_total": sub_total,
         "completed_date": completedDate,
         "is_rescheduled": is_rescheduled,
         "device_model_name": device_model_name,
@@ -177,6 +196,7 @@ class ServiceDetailsModel {
         "tax_amount": taxAmount,
         "created_at": createdAt,
         "couponcode": couponcode,
+        "wallet_part_payment": wallet_part_payment,
         "coupon_discount": couponDiscount,
         "payment_mode": paymentMode,
         "payment_type": paymentType,
@@ -191,6 +211,7 @@ class ServiceDetailsModel {
             List<dynamic>.from(visitAndQuote.map((x) => x.toJson())),
         "visit_and_quote_price": visitAndQuotePrice,
         "taxes": List<dynamic>.from(taxes.map((x) => x.toJson())),
+        'bill_details': billDetails?.toJson(),
       };
 }
 
@@ -233,13 +254,17 @@ class ServiceItem {
 class Tax {
   String id;
   String taxName;
+  String totalPrice;
   String taxType;
   String taxAmount;
+  String tax_percentage;
 
   Tax({
     required this.id,
     required this.taxName,
     required this.taxType,
+    required this.totalPrice,
+    this.tax_percentage = '',
     required this.taxAmount,
   });
 
@@ -247,6 +272,8 @@ class Tax {
         id: json["id"],
         taxName: json["tax_name"],
         taxType: json["tax_type"],
+        totalPrice: json["total_price"],
+        tax_percentage: json["tax_percentage"] ?? "",
         taxAmount: json["total_price"].toString(),
       );
 
@@ -254,13 +281,16 @@ class Tax {
         "id": id,
         "tax_name": taxName,
         "tax_type": taxType,
-        "tax_amount": taxAmount,
+        "tax_percentage": tax_percentage,
+        "total_price": taxAmount,
       };
 }
+
 class VisitAndQuote {
   String id;
   String serviceName;
   String price;
+  String sub_total;
   String serialNumber;
   String warrantyDays;
 
@@ -268,23 +298,75 @@ class VisitAndQuote {
     required this.id,
     required this.serviceName,
     required this.price,
+    required this.sub_total,
     required this.serialNumber,
     required this.warrantyDays,
   });
 
   factory VisitAndQuote.fromJson(Map<String, dynamic> json) => VisitAndQuote(
-    id: json["id"],
-    serviceName: json["service_name"],
-    price: json["price"],
-    serialNumber: json["serial_number"] ?? '',
-    warrantyDays: json["warrenty_days"] ?? '',
-  );
+        id: json["id"],
+        serviceName: json["service_name"],
+        price: json["price"],
+    sub_total: json["sub_total"],
+        serialNumber: json["serial_number"] ?? '',
+        warrantyDays: json["warrenty_days"] ?? '',
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "service_name": serviceName,
-    "price": price,
-    "serial_number": serialNumber,
-    "warrenty_days": warrantyDays,
-  };
+        "id": id,
+        "service_name": serviceName,
+        "price": price,
+        "sub_total": sub_total,
+        "serial_number": serialNumber,
+        "warrenty_days": warrantyDays,
+      };
+}
+
+class BillDetails {
+  List<VisitAndQuote>? visitAndQuote;
+  String? taxPercentage;
+  String? taxAmount;
+  String? paidOnline;
+  String? onlineAmount;
+  String? paymentStatus;
+  String? totalBill;
+
+  BillDetails(
+      {this.visitAndQuote,
+      this.taxPercentage,
+      this.taxAmount,
+      this.paidOnline,
+      this.onlineAmount,
+      this.paymentStatus,
+      this.totalBill});
+
+  BillDetails.fromJson(Map<String, dynamic> json) {
+    if (json['visit_and_quote'] != null) {
+      visitAndQuote = <VisitAndQuote>[];
+      json['visit_and_quote'].forEach((v) {
+        visitAndQuote!.add(new VisitAndQuote.fromJson(v));
+      });
+    }
+    taxPercentage = json['tax_percentage'];
+    taxAmount = json['tax_amount'];
+    paidOnline = json['paid_online'];
+    onlineAmount = json['online_amount'];
+    paymentStatus = json['payment_status'];
+    totalBill = json['total_bill'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.visitAndQuote != null) {
+      data['visit_and_quote'] =
+          this.visitAndQuote!.map((v) => v.toJson()).toList();
+    }
+    data['tax_percentage'] = this.taxPercentage;
+    data['tax_amount'] = this.taxAmount;
+    data['paid_online'] = this.paidOnline;
+    data['online_amount'] = this.onlineAmount;
+    data['payment_status'] = this.paymentStatus;
+    data['total_bill'] = this.totalBill;
+    return data;
+  }
 }

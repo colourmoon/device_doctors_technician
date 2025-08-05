@@ -41,32 +41,32 @@ class TipsDetailsWidget extends StatelessWidget {
           color: Colors.black,
         ),
         if (isCodcash) 5.ph,
-        if (isCodcash)
-          Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                  text: 'Limit:',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black,
-                    fontFamily: 'ProximaNova',
-                  ),
-                ),
-                TextSpan(
-                  text: '₹$limitPrice',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                    fontFamily: 'ProximaNova',
-                  ),
-                ),
-              ],
-            ),
-            textAlign: TextAlign.center,
-          ),
+        // if (isCodcash)
+        //   Text.rich(
+        //     TextSpan(
+        //       children: [
+        //         TextSpan(
+        //           text: 'Limit:',
+        //           style: TextStyle(
+        //             fontSize: 14,
+        //             fontWeight: FontWeight.w400,
+        //             color: Colors.black,
+        //             fontFamily: 'ProximaNova',
+        //           ),
+        //         ),
+        //         TextSpan(
+        //           text: '₹$limitPrice',
+        //           style: TextStyle(
+        //             fontSize: 14,
+        //             fontWeight: FontWeight.w600,
+        //             color: Colors.black,
+        //             fontFamily: 'ProximaNova',
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //     textAlign: TextAlign.center,
+        //   ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 15),
           child: CustomPaint(
@@ -102,25 +102,27 @@ class TipsListWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: MediaQuery.sizeOf(context).width * 0.75,
-                    child: CommonProximaNovaTextWidget(
-                        text: "ID:#$orderId,$name",
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                        maxLines: 2),
-                  ),
-                  CommonProximaNovaTextWidget(
-                    text: "${date}",
-                    fontSize: 10,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black,
-                  ),
-                ],
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: MediaQuery.sizeOf(context).width * 0.75,
+                      child: CommonProximaNovaTextWidget(
+                          text: "ID:#$orderId,$name",
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          maxLines: 2),
+                    ),
+                    CommonProximaNovaTextWidget(
+                      text: "${date}",
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
+                    ),
+                  ],
+                ),
               ),
               CommonProximaNovaTextWidget(
                 text: "+ ₹${amount}",

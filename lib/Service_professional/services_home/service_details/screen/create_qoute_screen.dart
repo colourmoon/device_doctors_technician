@@ -8,6 +8,7 @@ import 'package:device_doctors_technician/Service_professional/commons/common_te
 import 'package:device_doctors_technician/Service_professional/commons/common_toast.dart';
 import 'package:device_doctors_technician/Service_professional/services_bottombar/widgets/bottom_bar_appbar_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../services_bottombar/screen/services_bottombar_screen.dart';
 import '../../new_orders/logic/cubit/new_orders_cubit.dart';
 import '../logic/cubit/service_details_cubit.dart';
 import '../logic/sendqoute/cubit/send_quote_cubit.dart';
@@ -17,10 +18,12 @@ import 'review_quote_screen.dart';
 
 class CreateQuoteScreen extends StatefulWidget {
   final orderId, serviceId, totalamount;
+  final paymentMode;
   final List<VisitAndQuote> serviceItems;
   const CreateQuoteScreen(
       {super.key,
       required this.orderId,
+      required this.paymentMode,
       required this.serviceId,
       required this.serviceItems,
       required this.totalamount});
@@ -273,7 +276,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                         builder: (context) => ReviewQuoteScreen(
                           total: totalAmountController.text,
                           orderId: widget.orderId,
-                          serviceId: widget.serviceId,
+                          serviceId: widget.serviceId,paymentMode: widget.paymentMode,
                         ),
                       ));
                 } else {
@@ -286,7 +289,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                         builder: (context) => ReviewQuoteScreen(
                           total: totalAmountController.text,
                           orderId: widget.orderId,
-                          serviceId: widget.serviceId,
+                          serviceId: widget.serviceId, paymentMode: widget.paymentMode,
                         ),
                       ));
                 }
@@ -312,7 +315,21 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
               onPressed: () {
 
                 OrderDetailsScreenState.completeServiceBottomSheet(servicecubit:
-                context.read<ServiceDetailsCubit>(),context: context);
+                context.read<ServiceDetailsCubit>(),gcontext: context, paymentMode: widget.paymentMode, success: () {
+
+                  print('⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙⋙1');
+                  successSheet(context,() {
+                    successSheet(context,() {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (_) => const ServicesBottomBarScreen(initialIndex: 1),
+                        ),
+                            (route) => false,
+                      );
+                    },);
+                  },);
+                },);
               },
               child: const CommonProximaNovaTextWidget(
                 text: "Mark As Completed?",

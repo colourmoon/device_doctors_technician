@@ -42,6 +42,7 @@ class AwesomeNotificationService {
         channelKey: channelKey,
         title: title,
         body: body,
+
         bigPicture: bigPicture,
         notificationLayout: bigPicture != null
             ? NotificationLayout.BigPicture

@@ -1,17 +1,30 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:device_doctors_technician/Service_professional/commons/common_text_widget.dart';
 import 'package:device_doctors_technician/Service_professional/commons/shimmer_widgets/common_loading_widgets.dart';
 import 'package:device_doctors_technician/Service_professional/services_bottombar/widgets/bottom_bar_appbar_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dio/dio.dart';
+import '../../../../../comman/Api/Base-Api.dart';
+import '../../../../../comman/Api/end_points.dart';
+import '../../../../registration/onboarding/sceeen/onboarding_screen.dart';
 import '../logic/cubit/profile_cubit.dart';
 import '../widget/profile_widget.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+
+
+  @override
   Widget build(BuildContext context) {
+
+
     context.read<ProfileCubit>().fetchProfileData(false);
     return Scaffold(
       backgroundColor:  Colors.white,
@@ -19,7 +32,7 @@ class ProfileScreen extends StatelessWidget {
           leadingArrowOnTap: () {
             Navigator.pop(context);
           },
-          title: "Profile"),
+          title: "Profile", ),
       body: BlocBuilder<ProfileCubit, ProfileState>(
         builder: (context, state) {
           if (state.fetchLoading == true) {

@@ -28,6 +28,8 @@ import 'package:location_geocoder/location_geocoder.dart';
 import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart'
     as map;
 
+import 'location_permission_screen.dart';
+
 class ServicesRegistrationScreen extends StatefulWidget {
   const ServicesRegistrationScreen({super.key});
 
@@ -169,7 +171,7 @@ class _ServicesRegistrationScreenState
                     5.ph,
                     CommonProximaNovaTextWidget(
                       textAlign: TextAlign.center,
-                      text: "Hi, Welcome to the TechHouse Professional",
+                      text: "Hi, Welcome to the Device Doctor Technician",
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       color: AppthemeColor().themecolor,
@@ -251,95 +253,82 @@ class _ServicesRegistrationScreenState
                                   ),
                                 ))
                             : InkWell(
-                                onTap: () async {
-                                  try {
-                                    print(
-                                        'Checking location service and permission...');
-                                    geo.Location getLocation = geo.Location();
-                                    bool locationService = await Geolocator
-                                        .isLocationServiceEnabled();
+                            onTap: () async {
+                              try {
 
-                                    if (!locationService) {
-                                      bool allowed =
-                                          await getLocation.requestService();
-                                      if (allowed) {
-                                        print("Service enabled by user.");
-                                        permission = await Geolocator
-                                            .requestPermission();
-                                      } else {
-                                        print("Redirecting to settings...");
-                                        await Geolocator.openLocationSettings();
-                                        return;
-                                      }
-                                    }
+                                print('Checking location service and permission...');
+                                geo.Location getLocation = geo.Location();
 
-                                    permission =
-                                        await Geolocator.checkPermission();
+                                bool locationService = await Geolocator.isLocationServiceEnabled();
 
-                                    if (permission ==
-                                            LocationPermission.always ||
-                                        permission ==
-                                            LocationPermission.whileInUse) {
-                                      print("Fetching current position...");
-                                      setState(() {
-                                        isLocationFetchingLoading = true;
-                                      });
+                                if (!locationService) {
+                                  bool allowed = await getLocation.requestService();
+                                  if (!allowed) {
+                                    print("Redirecting to settings...");
+                                    await Geolocator.openLocationSettings();
+                                    return;
+                                  }
+                                }
 
-                                      currentLocation =
-                                          await Geolocator.getCurrentPosition();
+                                LocationPermission permission = await Geolocator.checkPermission();
 
-                                      print(
-                                          "Latitude: ${currentLocation?.latitude}, Longitude: ${currentLocation?.longitude}");
+                                if (permission == LocationPermission.denied ||
+                                    permission == LocationPermission.deniedForever) {
+                                  print("Permission not granted. Redirecting to custom location screen...");
+                                  // Navigate to your custom location permission screen
+                                  if (context.mounted) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const LocationPermissionScreen(),
+                                      ),
+                                    );
+                                  }
+                                  return;
+                                }
 
-                                      final coordinates = Coordinates(
-                                        currentLocation!.latitude,
-                                        currentLocation!.longitude,
-                                      );
+                                if (permission == LocationPermission.always ||
+                                    permission == LocationPermission.whileInUse) {
+                                  print("Fetching current position...");
+                                  setState(() {
+                                    isLocationFetchingLoading = true;
+                                  });
 
-                                      lat =
-                                          currentLocation!.latitude.toString();
-                                      long =
-                                          currentLocation!.longitude.toString();
+                                  currentLocation = await Geolocator.getCurrentPosition();
 
-                                      var addresses = await geocoder
-                                          .findAddressesFromCoordinates(
-                                              coordinates);
-                                      if (addresses.isNotEmpty) {
-                                        var first = addresses.first;
-                                        setState(() {
-                                          isLocationFetchingLoading = false;
-                                          location = null;
-                                          addressController.text =
-                                              first.addressLine ?? '';
-                                        });
-                                        print(
-                                            "Resolved Address: ${first.featureName} : ${first.addressLine}");
-                                      } else {
-                                        setState(() {
-                                          isLocationFetchingLoading = false;
-                                        });
-                                        print(
-                                            "No address found for the given coordinates.");
-                                        // Optional: show a toast/snackbar here
-                                      }
-                                    } else if (permission ==
-                                        LocationPermission.deniedForever) {
-                                      print(
-                                          "Permission denied forever. Opening app settings...");
-                                      await Geolocator.openAppSettings();
-                                    } else {
-                                      print("Requesting permission...");
-                                      permission =
-                                          await Geolocator.requestPermission();
-                                    }
-                                  } catch (e) {
+                                  final coordinates = Coordinates(
+                                    currentLocation!.latitude,
+                                    currentLocation!.longitude,
+                                  );
+
+                                  lat = currentLocation!.latitude.toString();
+                                  long = currentLocation!.longitude.toString();
+
+                                  var addresses = await geocoder.findAddressesFromCoordinates(coordinates);
+                                  if (addresses.isNotEmpty) {
+                                    var first = addresses.first;
+                                    setState(() {
+                                      isLocationFetchingLoading = false;
+                                      location = null;
+                                      addressController.text = first.addressLine ?? '';
+                                    });
+                                    print("Resolved Address: ${first.featureName} : ${first.addressLine}");
+                                  } else {
                                     setState(() {
                                       isLocationFetchingLoading = false;
                                     });
-                                    print("Error fetching location: $e");
+                                    print("No address found for the given coordinates.");
                                   }
-                                },
-                                child: Padding(
+                                }
+                              } catch (e) {
+                                setState(() {
+                                  isLocationFetchingLoading = false;
+                                });
+                                print("Error fetching location: $e");
+                              }
+                            }
+,
+                            child: Padding(
                                   padding: const EdgeInsets.all(9.0),
                                   child: SvgPicture.asset(
                                     'assets/services_new/currentLocation.svg',
@@ -692,7 +681,7 @@ class _ServicesRegistrationScreenState
                               )).then((value) {
                             registered = false;
                           });
-                        } else if (state.registrationfailed != null) {
+                        } else if (state.registrationfailed != null && state.registrationfailed?.isNotEmpty == true) {
                           CommonToastwidget(
                               toastmessage: state.registrationfailed);
                         }
@@ -710,6 +699,8 @@ class _ServicesRegistrationScreenState
                           buttonColor: AppthemeColor().appMainColor,
                           boardercolor: AppthemeColor().appMainColor,
                           buttonOnTap: () {
+                            FocusScope.of(context).unfocus();
+
                             if (formkey.currentState!.validate()) {
                               if (lat != "" && long != "") {
                                 Map<String, dynamic> bodyData = {

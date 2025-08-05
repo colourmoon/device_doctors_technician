@@ -78,7 +78,7 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
                 if (widget.canSkip) {
                   Navigator.pushAndRemoveUntil(
                     context,
-                    CupertinoPageRoute(
+                    MaterialPageRoute(
                       builder: (context) =>
                           const ServicesBottomBarScreen(initialIndex: 0),
                     ),

@@ -108,8 +108,8 @@ class _AddNewDeviceScreenState extends State<AddNewDeviceScreen> {
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return "Please enter your brand name";
-                  } else if (value.trim().length < 3) {
-                    return "Brand name must be at least 3 characters long";
+                  } else if (value.trim().length < 2) {
+                    return "Brand name must be at least 2 characters long";
                   } else if (invalidCharacters.hasMatch(value)) {
                     return "Brand name contains invalid characters";
                   }

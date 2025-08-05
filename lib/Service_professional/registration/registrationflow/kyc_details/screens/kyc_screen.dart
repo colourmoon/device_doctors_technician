@@ -134,7 +134,7 @@ class _KycDetailsState extends State<KycDetails> {
       appBar: commonAppBarWidget(
         isBack: !widget.canSkip,
         leadingArrowOnTap: () {
-          Navigator.pop(context);
+          Navigator.maybePop(context);
         },
         title: (widget.canSkip) ? "" : 'KYC Details',
         actions: [
@@ -182,7 +182,7 @@ class _KycDetailsState extends State<KycDetails> {
                   (route) => false,
                 );
               } else {
-                Navigator.pop(context);
+                Navigator.maybePop(context);
               }
             }
           },
@@ -713,7 +713,7 @@ class _KycDetailsState extends State<KycDetails> {
             children: [
               GestureDetector(
                 onTap: () async {
-                  Navigator.pop(context);
+                  Navigator.maybePop(context);
 
                   await getImage(imageSource.ImageSource.camera, picktype);
                 },
@@ -741,7 +741,7 @@ class _KycDetailsState extends State<KycDetails> {
               ),
               GestureDetector(
                 onTap: () async {
-                  Navigator.pop(context);
+                  Navigator.maybePop(context);
 
                   await getImage(imageSource.ImageSource.gallery, picktype);
                 },

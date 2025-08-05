@@ -202,7 +202,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         (route) => false,
                       );
                     } else {
-                      Navigator.push(
+                      Navigator.pop(context);
+                      Navigator.pushReplacement(
                           context,
                           CupertinoPageRoute(
                               builder: (context) =>

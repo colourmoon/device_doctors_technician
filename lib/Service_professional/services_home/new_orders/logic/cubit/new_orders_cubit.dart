@@ -121,11 +121,15 @@ class NewOrdersCubit extends Cubit<NewOrdersState> {
   // accept order
 
   acceptOrder({required String orderId}) async {
-    final accesToken =
-        await Constants.prefs?.getString("provider_access_token");
-    print("accept order : ${accesToken}");
-    emit(state.copyWith(isLoading: true));
+
+    if (ongoingRequest) return;
+
+    ongoingRequest = true;
     try {
+      final accesToken =
+      await Constants.prefs?.getString("provider_access_token");
+      print("accept order : ${accesToken}");
+      emit(state.copyWith(isLoading: true));
       Map<String, dynamic> bodyData = {
         "access_token": accesToken,
         "order_id": orderId,
@@ -133,7 +137,8 @@ class NewOrdersCubit extends Cubit<NewOrdersState> {
       print(bodyData.values);
       FormData data = await FormData.fromMap(bodyData);
       final dio = BaseApi().dioClient();
-      return await dio
+
+        await dio
           .post(ApiEndPoints().accept_order_endpoint, data: data)
           .then((response) {
         dynamic res = response.data;
@@ -185,6 +190,9 @@ class NewOrdersCubit extends Cubit<NewOrdersState> {
       } else {
         rethrow;
       }
+    }finally{
+
+      ongoingRequest = false;
     }
   }
 
@@ -257,3 +265,5 @@ class NewOrdersCubit extends Cubit<NewOrdersState> {
 
   // complete order
 }
+
+  bool ongoingRequest = false;

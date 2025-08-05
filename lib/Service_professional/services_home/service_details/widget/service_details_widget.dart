@@ -203,9 +203,11 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
       visitnquotetotal,
       is_vendor_update_device_details,
       is_amc_subscription,
+      is_quote,
       couponAmount,
       device_id,
       couponCode,
+      wallet_part_payment,
       lat,
       complaintText,
       deviceBrand,
@@ -214,9 +216,14 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
       device,
       modelName,
       status,
+      grand_total,
+      payment_mode,
       serialNno,
+      sub_total,
+      taxPercentage,
       long,
       customerAddress;
+  final BillDetails? billDetails;
   final List<Tax> taxesList;
   final List<VisitAndQuote> vistAndQuoteList;
   final List<ServiceItem> serviceBookingList;
@@ -224,8 +231,13 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
       {super.key,
       required this.orderId,
       required this.complaintText,
+      required this.sub_total,
+      required this.taxPercentage,
+      required this.grand_total,
       required this.serviceBookedOn,
       required this.device_id,
+      required this.is_quote,
+      required this.billDetails,
       required this.statusTime,
       required this.status,
       required this.customerName,
@@ -238,6 +250,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
       required this.is_vendor_update_device_details,
       required this.is_amc_subscription,
       required this.service_name,
+      required this.wallet_part_payment,
       this.orderStatus = '',
       required this.taxesList,
       required this.vistAndQuoteList,
@@ -250,20 +263,20 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
       required this.modelName,
       required this.device,
       required this.serialNno,
+      required this.payment_mode,
       required this.device_model_name});
 
   @override
   Widget build(BuildContext context) {
     context.read<SavedDevicesCubit>().updateDeviceDetails(
-        savedDevice: SavedDevice(
+            savedDevice: SavedDevice(
           brand: deviceBrand,
           deviceType: device,
           modelName: modelName,
           id: device_id,
           serialNumber: serialNno,
         ));
-    if(is_amc_subscription == 'yes'){
-
+    if (is_amc_subscription == 'yes') {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -299,25 +312,30 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                         color: Color(0xFF494949),
                       ),
                       const Spacer(),
-                      if(status != 'Pending')
-                      if(is_vendor_update_device_details.toLowerCase().trim() == 'no'  )
-                        GestureDetector(
-                          child: SvgPicture.string(editIcon, height: 14, width: 14),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => AddNewDeviceScreen(
-                                  id: device_id,
-                                  deviceModelName:  savedDevice?.deviceType??'',
-                                  selectBrand:  savedDevice?.brand ??'',
-                                  modelName: savedDevice?.modelName ??"",
-                                  serviceTag: savedDevice?.serialNumber ??'',
+                      if (status != 'Pending')
+                        if (is_vendor_update_device_details
+                                .toLowerCase()
+                                .trim() ==
+                            'no')
+                          GestureDetector(
+                            child: SvgPicture.string(editIcon,
+                                height: 14, width: 14),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                  builder: (context) => AddNewDeviceScreen(
+                                    id: device_id,
+                                    deviceModelName:
+                                        savedDevice?.deviceType ?? '',
+                                    selectBrand: savedDevice?.brand ?? '',
+                                    modelName: savedDevice?.modelName ?? "",
+                                    serviceTag: savedDevice?.serialNumber ?? '',
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
+                              );
+                            },
+                          ),
                     ],
                   ).symmetric(horizontal: 20),
                   5.ph,
@@ -327,31 +345,28 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                   5.ph,
                   _buildInfoRow('Model Name', savedDevice?.modelName),
                   5.ph,
-                  _buildInfoRow('Service tag/Serial no', savedDevice?.serialNumber),
+                  _buildInfoRow(
+                      'Service tag/Serial no', savedDevice?.serialNumber),
                   15.ph,
                 ],
               );
             },
-          )
-          ,
+          ),
           dottedLine,
           5.ph,
           ServiceStatusWidget(
-              image: "assets/services_new/Orderedservice.svg",
-              title: "SERVICE BOOKED ON",
-              description: serviceBookedOn)
+                  image: "assets/services_new/Orderedservice.svg",
+                  title: "SERVICE BOOKED ON",
+                  description: serviceBookedOn)
               .symmetric(horizontal: 20),
           5.ph,
-
           dottedLine,
           5.ph,
-
           Padding(
             padding: const EdgeInsets.only(left: 20, right: 15, top: 10),
             child: Row(
               children: [
-                SvgPicture.string(customerNameIcon,
-                    height: 14, width: 14),
+                SvgPicture.string(customerNameIcon, height: 14, width: 14),
                 3.pw,
                 const CommonProximaNovaTextWidget(
                   text: "CUSTOMER NAME",
@@ -362,7 +377,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
               ],
             ),
           ),
-            Padding(
+          Padding(
             padding: const EdgeInsets.only(left: 20, right: 15, top: 10),
             child: CommonProximaNovaTextWidget(
               text: customerName,
@@ -371,32 +386,32 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
               color: Colors.black,
             ),
           ),
-
           5.ph,
-
           dottedLine,
           5.ph,
           ServiceStatusWidget(
-              image: "assets/services_new/Mobile_no.svg",
-              title: "MOBILE NO",
-              phoneNumber: customerContact,
-              callimage: (orderStatus == "new" || orderStatus == "completed")
-                  ? ""
-                  : "assets/services_new/calls.png",
-              description: customerContact)
+                  image: "assets/services_new/Mobile_no.svg",
+                  title: "MOBILE NO",
+                  phoneNumber: customerContact,
+                  callimage:
+                      (orderStatus == "new" || orderStatus == "completed")
+                          ? ""
+                          : "assets/services_new/calls.png",
+                  description: customerContact)
               .symmetric(horizontal: 20),
           5.ph,
           dottedLine,
           5.ph,
           ServiceStatusWidget(
-              image: "assets/services_new/Address.svg",
-              title: "ADDRESS",
-              lat: lat,
-              long: long,
-              callimage: (orderStatus == "new" || orderStatus == "completed")
-                  ? ""
-                  : "assets/services_new/location.png",
-              description: customerAddress)
+                  image: "assets/services_new/Address.svg",
+                  title: "ADDRESS",
+                  lat: lat,
+                  long: long,
+                  callimage:
+                      (orderStatus == "new" || orderStatus == "completed")
+                          ? ""
+                          : "assets/services_new/location.png",
+                  description: customerAddress)
               .symmetric(horizontal: 22),
           5.ph,
           dottedLine,
@@ -405,8 +420,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
             padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
             child: Row(
               children: [
-                SvgPicture.string(complaint,
-                    height: 14, width: 14),
+                SvgPicture.string(complaint, height: 14, width: 14),
                 3.pw,
                 const CommonProximaNovaTextWidget(
                   text: "COMPLAINT",
@@ -417,8 +431,8 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
               ],
             ),
           ),
-            Padding(
-            padding: EdgeInsets.only(left: 20, right: 15, top: 10),
+          Padding(
+            padding: const EdgeInsets.only(left: 20, right: 15, top: 10),
             child: CommonProximaNovaTextWidget(
               text: complaintText,
               fontSize: 12,
@@ -427,7 +441,181 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
             ),
           ),
 
+          10.ph,
+          if (vistAndQuoteList.isNotEmpty)
+            dottedLine,
+          if (vistAndQuoteList.isNotEmpty)
 
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 15, right: 15, top: 15),
+                      child: CommonProximaNovaTextWidget(
+                        text: "Service Details",
+                        color: Colors.black,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    5.ph,
+                    for (int i = 0; i < vistAndQuoteList.length; i++)
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 15,
+                          right: 15,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            RichText(
+                              text: TextSpan(
+                                // Note: Styles for TextSpans must be explicitly defined.
+                                // Child text spans will inherit styles from parent
+                                style: TextStyle(
+                                    fontSize: 14.0,
+                                    fontFamily: AppthemeColor().themeFont,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w400),
+                                children: <TextSpan>[
+                                  TextSpan(text: 'Service ${i + 1} : '),
+                                  TextSpan(
+                                      text:
+                                          '${vistAndQuoteList[i].serviceName}',
+                                      style: TextStyle(
+                                          fontFamily: AppthemeColor().themeFont,
+                                          fontWeight: FontWeight.w600)),
+                                ],
+                              ),
+                            ),
+                            8.ph,
+                            RichText(
+                              text: TextSpan(
+                                // Note: Styles for TextSpans must be explicitly defined.
+                                // Child text spans will inherit styles from parent
+                                style: TextStyle(
+                                    fontSize: 14.0,
+                                    fontFamily: AppthemeColor().themeFont,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w400),
+                                children: <TextSpan>[
+                                  const TextSpan(text: 'Cost : '),
+                                  TextSpan(
+                                      text: '₹ ${vistAndQuoteList[i].price}',
+                                      style: TextStyle(
+                                          fontFamily: AppthemeColor().themeFont,
+                                          fontWeight: FontWeight.w600)),
+                                ],
+                              ),
+                            ),
+                            if (vistAndQuoteList[i].serialNumber != null &&
+                                vistAndQuoteList[i].serialNumber.isNotEmpty ==
+                                    true)
+                              8.ph,
+                            if (vistAndQuoteList[i].serialNumber != null &&
+                                vistAndQuoteList[i].serialNumber.isNotEmpty ==
+                                    true)
+                              RichText(
+                                text: TextSpan(
+                                  // Note: Styles for TextSpans must be explicitly defined.
+                                  // Child text spans will inherit styles from parent
+                                  style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontFamily: AppthemeColor().themeFont,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w400),
+                                  children: <TextSpan>[
+                                    const TextSpan(text: 'Serial Number : '),
+                                    TextSpan(
+                                        text: vistAndQuoteList[i].serialNumber,
+                                        style: TextStyle(
+                                            fontFamily:
+                                                AppthemeColor().themeFont,
+                                            fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
+                              ),
+                            if (vistAndQuoteList[i].warrantyDays != null &&
+                                vistAndQuoteList[i].warrantyDays.isNotEmpty ==
+                                    true)
+                              8.ph,
+                            if (vistAndQuoteList[i].warrantyDays != null &&
+                                vistAndQuoteList[i].warrantyDays.isNotEmpty ==
+                                    true)
+                              RichText(
+                                text: TextSpan(
+                                  // Note: Styles for TextSpans must be explicitly defined.
+                                  // Child text spans will inherit styles from parent
+                                  style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontFamily: AppthemeColor().themeFont,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w400),
+                                  children: <TextSpan>[
+                                    const TextSpan(text: 'Warranty Days : '),
+                                    TextSpan(
+                                        text: vistAndQuoteList[i].warrantyDays,
+                                        style: TextStyle(
+                                            fontFamily:
+                                                AppthemeColor().themeFont,
+                                            fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
+                              ),
+                            if (vistAndQuoteList[i].warrantyDays != null &&
+                                vistAndQuoteList[i].warrantyDays.isNotEmpty ==
+                                    true)
+                              8.ph,
+                          ],
+                        ),
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 15),
+                      child: CustomPaint(
+                        painter: DottedLinePainter(),
+                        child: const SizedBox(
+                          width: double.infinity,
+                          height: 1.0,
+                        ),
+                      ),
+                    ),
+                    4.ph,
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 15, right: 15, bottom: 8),
+                      child: RichText(
+                        text: TextSpan(
+                          // Note: Styles for TextSpans must be explicitly defined.
+                          // Child text spans will inherit styles from parent
+                          style: TextStyle(
+                              fontSize: 14.0,
+                              fontFamily: AppthemeColor().themeFont,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600),
+                          children: <TextSpan>[
+                            const TextSpan(text: 'Total Bill Amount : '),
+                            TextSpan(
+                                text: '₹ ${visitnquotetotal}',
+                                style: TextStyle(
+                                    fontFamily: AppthemeColor().themeFont,
+                                    fontWeight: FontWeight.w700)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    8.ph
+                  ],
+                ),
+              ),
+            ),
         ],
       );
     }
@@ -476,20 +664,22 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                       color: Color(0xFF494949),
                     ),
                     const Spacer(),
-
-                      if(is_vendor_update_device_details.toLowerCase().trim() == 'no' && status != 'Pending')
-                        GestureDetector(
-                        child: SvgPicture.string(editIcon, height: 14, width: 14),
+                    if (is_vendor_update_device_details.toLowerCase().trim() ==
+                            'no' &&
+                        status != 'Pending')
+                      GestureDetector(
+                        child:
+                            SvgPicture.string(editIcon, height: 14, width: 14),
                         onTap: () {
                           Navigator.push(
                             context,
                             CupertinoPageRoute(
                               builder: (context) => AddNewDeviceScreen(
                                 id: device_id,
-                                deviceModelName:  savedDevice?.deviceType??'',
-                                selectBrand:  savedDevice?.brand ??'',
-                                modelName: savedDevice?.modelName ??"",
-                                serviceTag: savedDevice?.serialNumber ??'',
+                                deviceModelName: savedDevice?.deviceType ?? '',
+                                selectBrand: savedDevice?.brand ?? '',
+                                modelName: savedDevice?.modelName ?? "",
+                                serviceTag: savedDevice?.serialNumber ?? '',
                               ),
                             ),
                           );
@@ -504,13 +694,13 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                 5.ph,
                 _buildInfoRow('Model Name', savedDevice?.modelName),
                 5.ph,
-                _buildInfoRow('Service tag/Serial no', savedDevice?.serialNumber),
+                _buildInfoRow(
+                    'Service tag/Serial no', savedDevice?.serialNumber),
                 15.ph,
               ],
             );
           },
-        )
-,
+        ),
         dottedLine,
         5.ph,
         ServiceStatusWidget(
@@ -542,7 +732,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
         dottedLine,
         5.ph,
         ServiceStatusWidget(
-            image: "assets/services_new/Customer_Name.svg",
+                image: "assets/services_new/Customer_Name.svg",
                 title: "Customer Name",
                 description: customerName)
             .symmetric(horizontal: 20),
@@ -576,119 +766,593 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
         5.ph,
         Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
-              child: Row(
-                children: [
-                  SvgPicture.asset("assets/services_new/billdetails.svg",
-                      height: 14, width: 14),
-                  3.pw,
-                  const CommonProximaNovaTextWidget(
-                    text: "Bill Details",
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xff494949),
-                  )
-                ],
-              ),
-            ),
-            5.ph,
-            BillDetailswidget(
-              title: "Sub Total",
-              price: "₹$platFormFee",
-              isBold: true,
-            ),
-            if (taxesList.isNotEmpty)
-              for (int i = 0; i < taxesList.length; i++)
-                if (taxesList[i].taxAmount != "0" &&
-                    taxesList[i].taxAmount != "null" &&
-                    taxesList[i].taxAmount != "0.00")
-                  BillDetailswidget(
-                    isBold: true,
-                    title: taxesList[i].taxName,
-                    price: "₹${taxesList[i].taxAmount}",
-                  ),
-            if (tipAmount != "0" && tipAmount != "" && tipAmount != "0.00")
-              BillDetailswidget(
-                title: "Tip",
-                price: "₹$tipAmount",
-                isBold: true,
-              ),
-            // if (serviceBookingList.isNotEmpty)
-            //   for (int j = 0; j < serviceBookingList.length; j++)
-            //     if (vistAndQuoteList.isNotEmpty &&
-            //         serviceBookingList[j].hasVisitAndQuote == "yes")
-            //       Column(
-            //         children: [
-            //           BillDetailswidget(
-            //             isBold: true,
-            //             title: "Service Name",
-            //             price: "${serviceBookingList[j].serviceName}",
-            //           ),
-            //           for (int k = 0; k < vistAndQuoteList.length; k++)
-            //             Column(
-            //               children: [
-            //                 BillDetailswidget(
-            //                   isBold: true,
-            //                   title: "${vistAndQuoteList[k].serviceName}",
-            //                   price: "₹${vistAndQuoteList[k].price}",
-            //                 ),
-            //                 // BillDetailswidget(
-            //                 //   isBold: true,
-            //                 //   title: "Cost",
-            //                 //   price: "₹${vistAndQuoteList[k].price}",
-            //                 // ),
-            //               ],
-            //             )
-            //         ],
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
+            //   child: Row(
+            //     children: [
+            //       SvgPicture.asset("assets/services_new/billdetails.svg",
+            //           height: 14, width: 14),
+            //       3.pw,
+            //       const CommonProximaNovaTextWidget(
+            //         text: "Bill Details",
+            //         fontSize: 12,
+            //         fontWeight: FontWeight.w600,
+            //         color: Color(0xff494949),
+            //       )
+            //     ],
+            //   ),
+            // ),
+            // 5.ph,
+            // BillDetailswidget(
+            //   title: "Sub Total",
+            //   price: "₹$platFormFee",
+            //   isBold: true,
+            // ),
+            // if (taxesList.isNotEmpty)
+            //   for (int i = 0; i < taxesList.length; i++)
+            //     if (taxesList[i].taxAmount != "0" &&
+            //         taxesList[i].taxAmount != "null" &&
+            //         taxesList[i].taxAmount != "0.00")
+            //       BillDetailswidget(
+            //         isBold: true,
+            //         title:
+            //             '${taxesList[i].taxName} (${taxesList[i].tax_percentage}%)',
+            //         price: "₹${taxesList[i].taxAmount}",
             //       ),
-            // // BillDetailswidget(
-            // //   title: "CGST",
-            // //   price: "₹$cgst",
-            // // ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: CustomPaint(
-                painter: DottedLinePainter(),
-                child: const SizedBox(
-                  width: double.infinity,
-                  height: 1.0,
+            // if (tipAmount != "0" && tipAmount != "" && tipAmount != "0.00")
+            //   BillDetailswidget(
+            //     title: "Tip",
+            //     price: "₹$tipAmount",
+            //     isBold: true,
+            //   ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(vertical: 4),
+            //   child: CustomPaint(
+            //     painter: DottedLinePainter(),
+            //     child: const SizedBox(
+            //       width: double.infinity,
+            //       height: 1.0,
+            //     ),
+            //   ),
+            // ),
+            // if (couponAmount != "0" &&
+            //     couponAmount != "null" &&
+            //     couponAmount != "0.00")
+            //   BillDetailswidget(
+            //     isBold: true,
+            //     title: couponCode,
+            //     price: "- ₹$couponAmount",
+            //   ),
+            // BillDetailswidget(
+            //   title: "Total",
+            //   isTitleBold: true,
+            //   isBold: true,
+            //   price: "₹$totalAmount",
+            // ),
+            10.ph,
+
+            if ( is_quote ==
+                '1') ...[
+              if (status !=
+                  "Cancelled")
+
+              Padding(
+                padding: const EdgeInsets.only(left: 15, right: 15, top: 0),
+                child: Row(
+                  children: [
+                    SvgPicture.asset("assets/services_new/billdetails.svg",
+                        height: 14, width: 14),
+                    3.pw,
+                    const CommonProximaNovaTextWidget(
+                      text: "Bill Details",
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xff494949),
+                    )
+                  ],
                 ),
               ),
-            ),
-            if (couponAmount != "0" &&
-                couponAmount != "null" &&
-                couponAmount != "0.00")
-              BillDetailswidget(
-                isBold: true,
-                title: couponCode,
-                price: "- ₹$couponAmount",
-              ),
-            BillDetailswidget(
-              title: "Total",
-              isTitleBold: true,
-              isBold: true,
-              price: "₹$totalAmount",
-            ),
-            10.ph
-          ],
-        ),
-        if (vistAndQuoteList.isNotEmpty)
-          Card(
-            margin: const EdgeInsets.symmetric(vertical: 5),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-            child: Column(
-              children: [
+              if (status !=
+                  "Cancelled")
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 0),
+                  child: Column(
+                    children: [
+                      Padding(
+                          padding: const EdgeInsets.only(
+                              left: 10, right: 10, top: 12),
+                          child: ListView.builder(
+                              physics:
+                              const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: billDetails
+                                  ?.visitAndQuote
+                                  ?.length ??
+                                  0,
+                              itemBuilder: (context, index) {
+                                final data = billDetails
+                                    ?.visitAndQuote?[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                      bottom: 5),
+                                  child:Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        data?.serviceName ?? '',
+                                        style: const TextStyle(
+                                            fontSize: 12,
+                                            color: const Color(0xFF5C5C5C),
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      Text(
+                                        '₹ ${ data?.sub_total ?? ''}',
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ],
+                                  ),
+
+                                );
+                              })),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10),
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Tax (${billDetails?.taxPercentage}%)',
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  color: const Color(0xFF5C5C5C),
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            Text(
+                              '₹ ${billDetails?.taxAmount}',
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(
+                      //       horizontal: 10),
+                      //   child: BookingText(
+                      //       title: 'Payment Mode',
+                      //       value: bookingState
+                      //           .serviceOrderViewData!
+                      //           .data!
+                      //           .paymentMode),
+                      // ),
+
+
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 10, right: 10, top: 0),
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Payment Status',
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  color: const Color(0xFF5C5C5C),
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            CommonProximaNovaTextWidget(
+                              text: payment_mode
+                                  ?.toLowerCase() !=
+                                  'cod'
+                                  ? 'Paid'
+                                  : 'Pending',
+                              fontSize: 14,
+                              color:
+                              ApplicationColours.blackColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ],
+                        ),
+                      ),
+                      // if (bookingState.serviceOrderViewData!.data!
+                      //     .visitAndQuote.isNotEmpty)
+                      //   ListView.builder(
+                      //       shrinkWrap: true,
+                      //       physics:
+                      //           const NeverScrollableScrollPhysics(),
+                      //       itemCount: bookingState
+                      //           .serviceOrderViewData!
+                      //           .data!
+                      //           .visitAndQuote
+                      //           .length,
+                      //       itemBuilder: (context, visitIndex) {
+                      //         return Padding(
+                      //           padding: const EdgeInsets.only(
+                      //             bottom: 5,
+                      //             left: 10,
+                      //             right: 10,
+                      //           ),
+                      //           child: Row(
+                      //             mainAxisAlignment:
+                      //                 MainAxisAlignment.spaceBetween,
+                      //             children: [
+                      //               Expanded(
+                      //                 child:
+                      //                     CommonProximaNovaTextWidget(
+                      //                   text: bookingState
+                      //                       .serviceOrderViewData!
+                      //                       .data!
+                      //                       .visitAndQuote[visitIndex]
+                      //                       .serviceName,
+                      //                   fontSize: 12,
+                      //                   color: ApplicationColours
+                      //                       .blackColor,
+                      //                   fontWeight: FontWeight.w600,
+                      //                 ),
+                      //               ),
+                      //               20.pw,
+                      //               CommonProximaNovaTextWidget(
+                      //                 text:
+                      //                     "₹ ${bookingState.serviceOrderViewData!.data!.visitAndQuote[visitIndex].price}",
+                      //                 fontSize: 14,
+                      //                 color: ApplicationColours
+                      //                     .blackColor,
+                      //                 fontWeight: FontWeight.w600,
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         );
+                      //       }),
+
+                      if (double.parse(tipAmount
+                          .toString()
+                          .replaceAll(',', '')) >
+                          0)
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              bottom: 0, left: 10, right: 10),
+                          child: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                            children: [
+                              const CommonProximaNovaTextWidget(
+                                text: 'Tip',
+                                fontSize: 12,
+                                color:
+                                ApplicationColours.blackColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              CommonProximaNovaTextWidget(
+                                text:
+                                '₹ ${tipAmount}',
+                                fontSize: 14,
+                                color:
+                                ApplicationColours.blackColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      if (double.parse(wallet_part_payment
+                          .toString()
+                          .replaceAll(',', '')) >
+                          0)
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              bottom: 0,
+                              left: 10,
+                              right: 10,
+                              top: 2),
+                          child: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                            children: [
+                              const CommonProximaNovaTextWidget(
+                                text: 'Used Wallet Amount',
+                                fontSize: 12,
+                                color:
+                                ApplicationColours.blackColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              CommonProximaNovaTextWidget(
+                                text:
+                                '- ₹ ${wallet_part_payment}',
+                                fontSize: 14,
+                                color:
+                                ApplicationColours.blackColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ],
+                          ),
+                        )else
+
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                top: 2, left: 10, right: 10),
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                const CommonProximaNovaTextWidget(
+                                  text: "Online Paid",
+                                  fontSize: 12,
+                                  color:
+                                  ApplicationColours.blackColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                CommonProximaNovaTextWidget(
+                                  text:
+                                  '- ₹${billDetails?.onlineAmount}',
+                                  fontSize: 14,
+                                  color:
+                                  ApplicationColours.blackColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      CustomPaint(
+                        painter: DottedLinePainter(),
+                        child: const SizedBox(
+                          width: double.infinity,
+                          height: 1,
+                        ),
+                      ),
+                      if (couponCode.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              top: 10, left: 10, right: 10),
+                          child: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                            children: [
+                              CommonProximaNovaTextWidget(
+                                text:couponCode,
+                                fontSize: 12,
+                                color:
+                                ApplicationColours.blackColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              CommonProximaNovaTextWidget(
+                                text:
+                                '- ₹ ${couponAmount}',
+                                fontSize: 14,
+                                color:
+                                ApplicationColours.blackColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ],
+                          ),
+                        ),
+                      CustomPaint(
+                        painter: DottedLinePainter(),
+                        child: const SizedBox(
+                          width: double.infinity,
+                          height: 1,
+                        ),
+                      ),
+                      14.ph,
+                      // if (bookingState.serviceOrderViewData!.data!
+                      //     .visitAndQuote.isNotEmpty)
+                      //   Container(
+                      //     padding: const EdgeInsets.only(
+                      //         bottom: 5.0, left: 10),
+                      //     child:
+                      //         const ServiceDetailsHeadingsWidget(
+                      //       title: 'QUOTE DETAILS',
+                      //     ),
+                      //   ),
+                      // if (bookingState.serviceOrderViewData!.data!
+                      //     .visitAndQuote.isNotEmpty)
+                      //   Container(
+                      //     margin: const EdgeInsets.symmetric(
+                      //         horizontal: 4, vertical: 10),
+                      //     child: Column(
+                      //       children: [
+                      //         ListView.builder(
+                      //             shrinkWrap: true,
+                      //             physics:
+                      //                 const NeverScrollableScrollPhysics(),
+                      //             itemCount: bookingState
+                      //                 .serviceOrderViewData!
+                      //                 .data!
+                      //                 .visitAndQuote
+                      //                 .length,
+                      //             itemBuilder:
+                      //                 (context, visitIndex) {
+                      //               return Column(
+                      //                 children: [
+                      //                   Padding(
+                      //                     padding:
+                      //                         const EdgeInsets
+                      //                             .only(
+                      //                       bottom: 5,
+                      //                       left: 10,
+                      //                       right: 10,
+                      //                     ),
+                      //                     child: Row(
+                      //                       mainAxisAlignment:
+                      //                           MainAxisAlignment
+                      //                               .spaceBetween,
+                      //                       children: [
+                      //                         Expanded(
+                      //                           child:
+                      //                               CommonProximaNovaTextWidget(
+                      //                             text: bookingState
+                      //                                     .serviceOrderViewData!
+                      //                                     .data!
+                      //                                     .visitAndQuote[
+                      //                                         visitIndex]
+                      //                                     .serviceName[
+                      //                                         0]
+                      //                                     .toUpperCase() +
+                      //                                 bookingState
+                      //                                     .serviceOrderViewData!
+                      //                                     .data!
+                      //                                     .visitAndQuote[
+                      //                                         visitIndex]
+                      //                                     .serviceName
+                      //                                     .substring(
+                      //                                         1),
+                      //                             fontSize: 12,
+                      //                             color: ApplicationColours
+                      //                                 .blackColor,
+                      //                             fontWeight:
+                      //                                 FontWeight
+                      //                                     .w600,
+                      //                           ),
+                      //                         ),
+                      //                         20.pw,
+                      //                         CommonProximaNovaTextWidget(
+                      //                           text:
+                      //                               "₹ ${bookingState.serviceOrderViewData!.data!.visitAndQuote[visitIndex].price}",
+                      //                           fontSize: 14,
+                      //                           color:
+                      //                               ApplicationColours
+                      //                                   .blackColor,
+                      //                           fontWeight:
+                      //                               FontWeight
+                      //                                   .w600,
+                      //                         ),
+                      //                       ],
+                      //                     ),
+                      //                   ),
+                      //                 ],
+                      //               );
+                      //             }),
+                      //         Padding(
+                      //           padding: const EdgeInsets.only(
+                      //             bottom: 5,
+                      //             left: 10,
+                      //             right: 10,
+                      //           ),
+                      //           child: Row(
+                      //             mainAxisAlignment:
+                      //                 MainAxisAlignment
+                      //                     .spaceBetween,
+                      //             children: [
+                      //               const Expanded(
+                      //                 child:
+                      //                     CommonProximaNovaTextWidget(
+                      //                   text: "Payment Status",
+                      //                   fontSize: 12,
+                      //                   color: ApplicationColours
+                      //                       .blackColor,
+                      //                   fontWeight:
+                      //                       FontWeight.w600,
+                      //                 ),
+                      //               ),
+                      //               20.pw,
+                      //               CommonProximaNovaTextWidget(
+                      //                 text: bookingState
+                      //                     .serviceOrderViewData!
+                      //                     .data!
+                      //                     .paymentType,
+                      //                 fontSize: 14,
+                      //                 color: ApplicationColours
+                      //                     .blackColor,
+                      //                 fontWeight: FontWeight.w600,
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         ),
+                      //         CustomPaint(
+                      //           painter: dot.DottedLinePainter(),
+                      //           child: const SizedBox(
+                      //             width: double.infinity,
+                      //             height: 1,
+                      //           ),
+                      //         ),
+                      //         Padding(
+                      //           padding: const EdgeInsets.only(
+                      //               left: 10,
+                      //               right: 10,
+                      //               bottom: 5,
+                      //               top: 5),
+                      //           child: Row(
+                      //             mainAxisAlignment:
+                      //                 MainAxisAlignment
+                      //                     .spaceBetween,
+                      //             children: [
+                      //               const CommonProximaNovaTextWidget(
+                      //                 text: 'Total Quotation',
+                      //                 fontSize: 16,
+                      //                 color: ApplicationColours
+                      //                     .blackColor,
+                      //                 fontWeight: FontWeight.w600,
+                      //               ),
+                      //               CommonProximaNovaTextWidget(
+                      //                 text:
+                      //                     '₹ ${bookingState.serviceOrderViewData!.data!.visitAndQuotePrice}',
+                      //                 fontSize: 16,
+                      //                 color: ApplicationColours
+                      //                     .blackColor,
+                      //                 fontWeight: FontWeight.w600,
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 10,
+                            right: 10,
+                            bottom: 15,
+                            top: 5),
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            const CommonProximaNovaTextWidget(
+                              text: 'Total Bill',
+                              fontSize: 16,
+                              color:
+                              ApplicationColours.blackColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            CommonProximaNovaTextWidget(
+                              text:
+                              '₹ ${billDetails?.totalBill}',
+                              fontSize: 16,
+                              color:
+                              ApplicationColours.blackColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ]
+            else ...[
+              if (status !=
+                  "Cancelled")
+
                 Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
+                  padding: const EdgeInsets.only(left: 15, right: 15, top: 0),
                   child: Row(
                     children: [
                       SvgPicture.asset("assets/services_new/billdetails.svg",
                           height: 14, width: 14),
                       3.pw,
-                      CommonProximaNovaTextWidget(
-                        text: "Quote Details",
+                      const CommonProximaNovaTextWidget(
+                        text: "Bill Details",
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: Color(0xff494949),
@@ -696,65 +1360,511 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                5.ph,
-
-                if (serviceBookingList.isNotEmpty)
-                  for (int j = 0; j < serviceBookingList.length; j++)
-                    if (vistAndQuoteList.isNotEmpty &&
-                        serviceBookingList[j].hasVisitAndQuote == "yes")
-                      Column(
-                        children: [
-                          // BillDetailswidget(
-                          //   isBold: true,
-                          //   title: "Service Name",
-                          //   price: "${serviceBookingList[j].serviceName}",
-                          // ),
-
-                          for (int k = 0; k < vistAndQuoteList.length; k++)
-                            Column(
-                              children: [
-                                BillDetailswidget(
-                                  isBold: true,
-                                  title: "${vistAndQuoteList[k].serviceName}",
-                                  price: "₹${vistAndQuoteList[k].price}",
-                                ),
-                                // BillDetailswidget(
-                                //   isBold: true,
-                                //   title: "Cost",
-                                //   price: "₹${vistAndQuoteList[k].price}",
-                                // ),
-                              ],
-                            )
-                        ],
+              if (status !=
+                  "Cancelled")
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 0),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 10, right: 10, top: 0),
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Sub Total',
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  color: const Color(0xFF5C5C5C),
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            CommonProximaNovaTextWidget(
+                              text:
+                              '₹ ${sub_total}',
+                              fontSize: 14,
+                              color:
+                              ApplicationColours.blackColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ],
+                        ),
                       ),
-                // BillDetailswidget(
-                //   title: "CGST",
-                //   price: "₹$cgst",
-                // ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: CustomPaint(
-                    painter: DottedLinePainter(),
-                    child: const SizedBox(
-                      width: double.infinity,
-                      height: 1.0,
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 10,
+                          right: 10,
+                        ),
+                        child: ListView.builder(
+                            physics:
+                            const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: taxesList
+                                .length ??
+                                0,
+                            itemBuilder: (context, index) {
+                              final taxData = taxesList[index];
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 0.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment
+                                      .spaceBetween,
+                                  children: [
+                                    Text(
+                                      '${taxData?.taxName} (${taxData?.tax_percentage}%)',
+                                      style: const TextStyle(
+                                          fontSize: 12,
+                                          color: const Color(
+                                              0xFF5C5C5C),
+                                          fontWeight:
+                                          FontWeight.w500),
+                                    ),
+                                    Text(
+                                      '₹ ${taxData?.totalPrice}',
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight:
+                                          FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+
+                        // Row(
+                        //   mainAxisAlignment:
+                        //       MainAxisAlignment.spaceBetween,
+                        //   children: [
+                        //     const CommonProximaNovaTextWidget(
+                        //       text: 'Tax Amount',
+                        //       fontSize: 12,
+                        //       color: ApplicationColours.blackColor,
+                        //       fontWeight: FontWeight.w600,
+                        //     ),
+                        //     CommonProximaNovaTextWidget(
+                        //       text:
+                        //           '₹ ${bookingState.serviceOrderViewData!.data!.taxAmount}',
+                        //       fontSize: 14,
+                        //       color: ApplicationColours.blackColor,
+                        //       fontWeight: FontWeight.w600,
+                        //     ),
+                        //   ],
+                        // ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 10, right: 10, top: 0),
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Payment Mode',
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  color: const Color(0xFF5C5C5C),
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            CommonProximaNovaTextWidget(
+                              text: payment_mode,
+                              fontSize: 14,
+                              color:
+                              ApplicationColours.blackColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 10, right: 10, top: 0),
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Payment Status',
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  color: const Color(0xFF5C5C5C),
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            CommonProximaNovaTextWidget(
+                              text: payment_mode
+                                  ?.toLowerCase() !=
+                                  'cod'
+                                  ? 'Paid'
+                                  : 'Pending',
+                              fontSize: 14,
+                              color:
+                              ApplicationColours.blackColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      if (double.parse(tipAmount
+                          .toString()
+                          .replaceAll(',', '')) >
+                          0)
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              bottom: 0, left: 10, right: 10),
+                          child: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                            children: [
+                              const CommonProximaNovaTextWidget(
+                                text: 'Tip',
+                                fontSize: 12,
+                                color:
+                                ApplicationColours.blackColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              CommonProximaNovaTextWidget(
+                                text:
+                                '₹ ${tipAmount}',
+                                fontSize: 14,
+                                color:
+                                ApplicationColours.blackColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (double.parse(wallet_part_payment
+                          .toString()
+                          .replaceAll(',', '')) >
+                          0)
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              bottom: 0,
+                              left: 10,
+                              right: 10,
+                              top: 2),
+                          child: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                            children: [
+                              const CommonProximaNovaTextWidget(
+                                text: 'Used Wallet Amount',
+                                fontSize: 12,
+                                color:
+                                ApplicationColours.blackColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              CommonProximaNovaTextWidget(
+                                text:
+                                '- ₹ ${wallet_part_payment}',
+                                fontSize: 14,
+                                color:
+                                ApplicationColours.blackColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ],
+                          ),
+                        ),
+                      // if (double.parse(bookingState
+                      //         .serviceOrderViewData!
+                      //         .data!
+                      //         .grandTotal
+                      //         .toString()
+                      //         .replaceAll(',', '')) >
+                      //     0)
+                      // Padding(
+                      //   padding: const EdgeInsets.only(
+                      //       top: 2, left: 10, right: 10),
+                      //   child: Row(
+                      //     mainAxisAlignment:
+                      //         MainAxisAlignment.spaceBetween,
+                      //     children: [
+                      //       const CommonProximaNovaTextWidget(
+                      //         text: "Online Paid",
+                      //         fontSize: 12,
+                      //         color:
+                      //             ApplicationColours.blackColor,
+                      //         fontWeight: FontWeight.w600,
+                      //       ),
+                      //       CommonProximaNovaTextWidget(
+                      //         text:
+                      //             '₹ ${bookingState.serviceOrderViewData!.data!.grandTotal}',
+                      //         fontSize: 14,
+                      //         color:
+                      //             ApplicationColours.blackColor,
+                      //         fontWeight: FontWeight.w600,
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      CustomPaint(
+                        painter: DottedLinePainter(),
+                        child: const SizedBox(
+                          width: double.infinity,
+                          height: 1,
+                        ),
+                      ),
+                      if (couponCode !=
+                          '')
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              top: 10, left: 10, right: 10),
+                          child: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                            children: [
+                              CommonProximaNovaTextWidget(
+                                text: couponCode,
+                                fontSize: 12,
+                                color:
+                                ApplicationColours.blackColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              CommonProximaNovaTextWidget(
+                                text:
+                                '- ₹ ${couponAmount}',
+                                fontSize: 14,
+                                color:
+                                ApplicationColours.blackColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ],
+                          ),
+                        ),
+                      CustomPaint(
+                        painter: DottedLinePainter(),
+                        child: const SizedBox(
+                          width: double.infinity,
+                          height: 1,
+                        ),
+                      ),
+                      14.ph,
+
+
+
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 10,
+                            right: 10,
+                            bottom: 15,
+                            top: 5),
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            const CommonProximaNovaTextWidget(
+                              text: 'Total Bill',
+                              fontSize: 16,
+                              color:
+                              ApplicationColours.blackColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            CommonProximaNovaTextWidget(
+                              text:
+                              '₹ ${grand_total }',
+                              fontSize: 16,
+                              color:
+                              ApplicationColours.blackColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+            ],
+          ],
+        ),
 
-                BillDetailswidget(
-                  title: "Total",
-                  isTitleBold: true,
-                  isBold: true,
-                  price: "₹$visitnquotetotal",
-                ),
-                10.ph
-              ],
-            ),
-          ),
+        // 10.ph,
+        // if (vistAndQuoteList.isNotEmpty)
+        //   dottedLine,
+        // if (vistAndQuoteList.isNotEmpty)
+        //   Container(
+        //     margin: const EdgeInsets.symmetric(horizontal: 4),
+        //     decoration: BoxDecoration(
+        //       borderRadius: BorderRadius.circular(8),
+        //     ),
+        //     child: SizedBox(
+        //       width: double.infinity,
+        //       child: Column(
+        //         crossAxisAlignment: CrossAxisAlignment.start,
+        //         children: [
+        //           const Padding(
+        //             padding: EdgeInsets.only(left: 15, right: 15, top: 15),
+        //             child: CommonProximaNovaTextWidget(
+        //               text: "Service Details",
+        //               color: Colors.black,
+        //               fontSize: 12,
+        //               fontWeight: FontWeight.w600,
+        //             ),
+        //           ),
+        //           5.ph,
+        //           for (int i = 0; i < vistAndQuoteList.length; i++)
+        //             if (vistAndQuoteList.isNotEmpty )
+        //               Padding(
+        //                 padding: const EdgeInsets.only(
+        //                   left: 15,
+        //                   right: 15,
+        //                 ),
+        //                 child: Column(
+        //                   crossAxisAlignment: CrossAxisAlignment.start,
+        //                   children: [
+        //                     RichText(
+        //                       text: TextSpan(
+        //                         // Note: Styles for TextSpans must be explicitly defined.
+        //                         // Child text spans will inherit styles from parent
+        //                         style: TextStyle(
+        //                             fontSize: 14.0,
+        //                             fontFamily: AppthemeColor().themeFont,
+        //                             color: Colors.black,
+        //                             fontWeight: FontWeight.w400),
+        //                         children: <TextSpan>[
+        //                           TextSpan(text: 'Service ${i + 1} : '),
+        //                           TextSpan(
+        //                               text:
+        //                                   '${vistAndQuoteList[i].serviceName}',
+        //                               style: TextStyle(
+        //                                   fontFamily: AppthemeColor().themeFont,
+        //                                   fontWeight: FontWeight.w600)),
+        //                         ],
+        //                       ),
+        //                     ),
+        //                     8.ph,
+        //                     RichText(
+        //                       text: TextSpan(
+        //                         // Note: Styles for TextSpans must be explicitly defined.
+        //                         // Child text spans will inherit styles from parent
+        //                         style: TextStyle(
+        //                             fontSize: 14.0,
+        //                             fontFamily: AppthemeColor().themeFont,
+        //                             color: Colors.black,
+        //                             fontWeight: FontWeight.w400),
+        //                         children: <TextSpan>[
+        //                           const TextSpan(text: 'Cost : '),
+        //                           TextSpan(
+        //                               text: '₹ ${vistAndQuoteList[i].price}',
+        //                               style: TextStyle(
+        //                                   fontFamily: AppthemeColor().themeFont,
+        //                                   fontWeight: FontWeight.w600)),
+        //                         ],
+        //                       ),
+        //                     ),
+        //                     if (vistAndQuoteList[i].serialNumber != null &&
+        //                         vistAndQuoteList[i].serialNumber.isNotEmpty ==
+        //                             true)
+        //                       8.ph,
+        //                     if (vistAndQuoteList[i].serialNumber != null &&
+        //                         vistAndQuoteList[i].serialNumber.isNotEmpty ==
+        //                             true)
+        //                       RichText(
+        //                         text: TextSpan(
+        //                           // Note: Styles for TextSpans must be explicitly defined.
+        //                           // Child text spans will inherit styles from parent
+        //                           style: TextStyle(
+        //                               fontSize: 14.0,
+        //                               fontFamily: AppthemeColor().themeFont,
+        //                               color: Colors.black,
+        //                               fontWeight: FontWeight.w400),
+        //                           children: <TextSpan>[
+        //                             const TextSpan(text: 'Serial Number : '),
+        //                             TextSpan(
+        //                                 text: vistAndQuoteList[i].serialNumber,
+        //                                 style: TextStyle(
+        //                                     fontFamily:
+        //                                         AppthemeColor().themeFont,
+        //                                     fontWeight: FontWeight.w600)),
+        //                           ],
+        //                         ),
+        //                       ),
+        //                     if (vistAndQuoteList[i].warrantyDays != null &&
+        //                         vistAndQuoteList[i].warrantyDays.isNotEmpty ==
+        //                             true)
+        //                       8.ph,
+        //                     if (vistAndQuoteList[i].warrantyDays != null &&
+        //                         vistAndQuoteList[i].warrantyDays.isNotEmpty ==
+        //                             true)
+        //                       RichText(
+        //                         text: TextSpan(
+        //                           // Note: Styles for TextSpans must be explicitly defined.
+        //                           // Child text spans will inherit styles from parent
+        //                           style: TextStyle(
+        //                               fontSize: 14.0,
+        //                               fontFamily: AppthemeColor().themeFont,
+        //                               color: Colors.black,
+        //                               fontWeight: FontWeight.w400),
+        //                           children: <TextSpan>[
+        //                             const TextSpan(text: 'Warranty Days : '),
+        //                             TextSpan(
+        //                                 text: vistAndQuoteList[i].warrantyDays,
+        //                                 style: TextStyle(
+        //                                     fontFamily:
+        //                                         AppthemeColor().themeFont,
+        //                                     fontWeight: FontWeight.w600)),
+        //                           ],
+        //                         ),
+        //                       ),
+        //                     if (vistAndQuoteList[i].warrantyDays != null &&
+        //                         vistAndQuoteList[i].warrantyDays.isNotEmpty ==
+        //                             true)
+        //                       8.ph,
+        //                   ],
+        //                 ),
+        //               ),
+        //           Padding(
+        //             padding:
+        //                 const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+        //             child: CustomPaint(
+        //               painter: DottedLinePainter(),
+        //               child: const SizedBox(
+        //                 width: double.infinity,
+        //                 height: 1.0,
+        //               ),
+        //             ),
+        //           ),
+        //           4.ph,
+        //           Padding(
+        //             padding:
+        //                 const EdgeInsets.only(left: 15, right: 15, bottom: 8),
+        //             child: RichText(
+        //               text: TextSpan(
+        //                 // Note: Styles for TextSpans must be explicitly defined.
+        //                 // Child text spans will inherit styles from parent
+        //                 style: TextStyle(
+        //                     fontSize: 14.0,
+        //                     fontFamily: AppthemeColor().themeFont,
+        //                     color: Colors.black,
+        //                     fontWeight: FontWeight.w600),
+        //                 children: <TextSpan>[
+        //                   const TextSpan(text: 'Total Bill Amount : '),
+        //                   TextSpan(
+        //                       text: '₹ ${visitnquotetotal}',
+        //                       style: TextStyle(
+        //                           fontFamily: AppthemeColor().themeFont,
+        //                           fontWeight: FontWeight.w700)),
+        //                 ],
+        //               ),
+        //             ),
+        //           ),
+        //           8.ph
+        //         ],
+        //       ),
+        //     ),
+        //   ),
       ],
     );
   }
+
   Widget _buildInfoRow(String title, String? value) {
     return Row(
       children: [
@@ -783,7 +1893,6 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
       ],
     ).symmetric(horizontal: 20);
   }
-
 }
 
 class SwipeButtons extends StatelessWidget {
@@ -794,7 +1903,7 @@ class SwipeButtons extends StatelessWidget {
   const SwipeButtons(
       {super.key,
       required this.buttontitle,
-        this.fontSize = 14,
+      this.fontSize = 14,
       required this.onButtonDragged,
       this.isLoading = false});
 
@@ -839,7 +1948,7 @@ class SwipeButtons extends StatelessWidget {
         },
         child: Text(
           buttontitle,
-          style:   TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontSize: fontSize,
             fontWeight: FontWeight.bold,
@@ -856,6 +1965,7 @@ class CompleteOrderEarningsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return SizedBox();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
       child: DottedBorder(
@@ -928,7 +2038,8 @@ const complaint = '''
 </clipPath>
 </defs>
 </svg>
-''';const customerNameIcon = '''
+''';
+const customerNameIcon = '''
 
 <svg width="13" height="14" viewBox="0 0 13 14" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M1.51562 4.55939C1.51562 7.06705 3.56735 9.11877 6.07501 9.11877C8.58267 9.11877 10.6344 7.06705 10.6344 4.55939C10.6344 2.05172 8.58267 0 6.07501 0C3.56735 0 1.51562 2.05172 1.51562 4.55939ZM9.5616 4.55939C9.5616 6.47701 7.99264 8.04598 6.07501 8.04598C4.15739 8.04598 2.58842 6.47701 2.58842 4.55939C2.58842 2.64176 4.15739 1.0728 6.07501 1.0728C7.99264 1.0728 9.5616 2.64176 9.5616 4.55939Z" fill="#494949"/>

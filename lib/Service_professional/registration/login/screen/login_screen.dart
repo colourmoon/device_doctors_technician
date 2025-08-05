@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -11,17 +12,25 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../commons/common_button_widget.dart';
 import '../../../commons/common_toast.dart';
 import '../../../commons/shimmer_widgets/common_loading_widgets.dart';
+import '../../../services_home/more_options/terms_and_conditions/screen/terms_and_conditions_screen.dart';
 import '../../registrationflow/registrationScreen/screen/register_screen.dart';
 import '../../verification/screen/otp_verification_screen.dart';
 import '../logic/cubit/login_cubit.dart';
 
-class ServicesLoginScreen extends StatelessWidget {
+class ServicesLoginScreen extends StatefulWidget {
   const ServicesLoginScreen({super.key});
 
   @override
+  State<ServicesLoginScreen> createState() => _ServicesLoginScreenState();
+}
+
+class _ServicesLoginScreenState extends State<ServicesLoginScreen> {
+  bool _acceptTerms = false;
+
+  final formkey = GlobalKey<FormState>();
+  TextEditingController phoneNumberController = TextEditingController();
+  @override
   Widget build(BuildContext context) {
-    final formkey = GlobalKey<FormState>();
-    TextEditingController phoneNumberController = TextEditingController();
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(top: 70, left: 20, right: 20),
@@ -84,6 +93,73 @@ class ServicesLoginScreen extends StatelessWidget {
                 ),
               ),
               12.ph,
+
+              Row(
+                children: [
+                  Checkbox(
+                    fillColor: WidgetStateProperty.all(
+                      const Color(0xFFD3DBE8),
+                    ), // checkbox fill color
+                    checkColor: Colors.white, // tick/check color
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                      BorderRadius.circular(6), // border radius
+                    ),
+                    value:
+                    _acceptTerms, // _acceptTerms is a boolean variable to track the state of the checkbox
+                    onChanged: (bool? value) {
+                      if (mounted) {
+                        setState(() {
+                          _acceptTerms = value ??
+                              false; // Update the state when the checkbox value changes
+                        });
+                      }
+                    },
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 40, top: 10),
+                      child: RichText(
+                        text: TextSpan(
+                          children: [
+                            const TextSpan(
+                              text: 'While Login I accept all ',
+                              style: TextStyle(
+                                color: const Color(0xFF222534),
+                                fontSize: 12,
+                                fontFamily: 'ProximaNova',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Terms and Conditions',
+                              style: const TextStyle(
+                                color: Color(0xFF222534),
+                                fontSize: 12,
+                                fontFamily: 'ProximaNova',
+                                fontWeight: FontWeight.w600,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Navigator.push(
+                                      context,
+                                      CupertinoPageRoute(
+                                        builder: (context) => TermsAndConditionsScreen(
+                                            title: "Terms And Conditions"),
+                                      ));
+                                },
+                            ),
+                            const TextSpan(
+                              text: ' ',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              12.ph,
               BlocConsumer<LoginCubit, LoginState>(
                 listener: (context, state) {
                   if (state is LoginSuccess) {
@@ -111,10 +187,22 @@ class ServicesLoginScreen extends StatelessWidget {
                       boardercolor: AppthemeColor().appMainColor,
                       buttonOnTap: () {
                         if (formkey.currentState!.validate()) {
-                          Map<String, dynamic> bodyData = {
-                            "mobile": phoneNumberController.text
-                          };
-                          context.read<LoginCubit>().login(bodyData);
+                          if (_acceptTerms == true) {
+                            Map<String, dynamic> bodyData = {
+                              "mobile": phoneNumberController.text
+                            };
+                            context.read<LoginCubit>().login(bodyData);
+                          } else {
+                            Fluttertoast.showToast(
+                                msg: "Accept Terms & Conditions",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.black,
+                                textColor: Colors.white,
+                                fontSize: 12.0);
+                          }
+
                         } else {
                           CommonToastwidget(
                             toastmessage: "Unable to login please try again",

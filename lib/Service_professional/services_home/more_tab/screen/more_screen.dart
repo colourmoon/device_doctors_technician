@@ -6,6 +6,7 @@ import 'package:device_doctors_technician/Service_professional/registration/regi
 import 'package:device_doctors_technician/Service_professional/services_home/more_options/profile/logic/cubit/profile_cubit.dart';
 import 'package:device_doctors_technician/utility/auth_shared_pref.dart';
 
+import '../../../../comman/Api/Base-Api.dart';
 import '../../../registration/onboarding/sceeen/onboarding_screen.dart';
 import '../../../registration/registrationflow/bank_details/screen/bank_details_screen.dart';
 import '../../../registration/registrationflow/kyc_details/screens/kyc_screen.dart';
@@ -22,10 +23,157 @@ import '../../more_options/terms_and_conditions/screen/terms_and_conditions_scre
 import '../logic/cubit/logout_cubit.dart';
 import '../widget/more_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dio/dio.dart';
 
-class MoreScreen extends StatelessWidget {
+class MoreScreen extends StatefulWidget {
   const MoreScreen({super.key});
 
+  @override
+  State<MoreScreen> createState() => _MoreScreenState();
+}
+
+class _MoreScreenState extends State<MoreScreen> {
+  final ValueNotifier<bool> isDeleting = ValueNotifier(false);
+
+  final String apiUrl = 'homeservices/vendor/delete_account';
+
+  Future<void> deleteAccount() async {
+    isDeleting.value = true;
+
+    try {
+      FormData formData = FormData.fromMap({
+        'access_token': Constants.prefs?.getString("provider_access_token"),
+      });
+      final response = await BaseApi().dioClient()
+          .post(apiUrl, data: formData);
+
+      final data = response.data;
+      String title = data['title'] ?? 'Message';
+      String message = data['message'] ?? 'Unknown response';
+
+      Constants.prefs?.remove("provider_access_token");
+      showDialog(
+          context: context,
+          builder: (_) => WillPopScope(onWillPop: () async{
+            Navigator.pushAndRemoveUntil(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => ServicesOnboardingScreen(),
+                ),
+                    (route) => false);
+            return false;
+          },
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Row(
+                children: const [
+                  Icon(Icons.check_circle, color: Colors.green, size: 28),
+                  SizedBox(width: 8),
+                  Text(
+                    "Success",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                ],
+              ),
+              content: const Text(
+                "Your Account is Deleted Successfully",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black87,
+                ),
+              ),
+              actions: [
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () =>   Navigator.pushAndRemoveUntil(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => ServicesOnboardingScreen(),
+                        ),
+                            (route) => false),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      "Ok",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+              actionsAlignment: MainAxisAlignment.center,
+            ),
+          )
+      );
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => const AlertDialog(
+          title: Text("Error"),
+          content: Text("Something went wrong. Please try again."),
+        ),
+      );
+    } finally {
+      isDeleting.value = false;
+    }
+  }
+
+  void confirmDeleteDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          "Confirm Delete",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("The following data will be permanently deleted:"),
+            SizedBox(height: 10),
+            Text("- Technician Info"),
+            Text("- Orders"),
+            Text("- Categories"),
+            Text("- Payout History"),
+            SizedBox(height: 16),
+            Text("Are you sure you want to delete your account?"),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("No"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              deleteAccount();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            child: const Text("Yes, Delete"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    isDeleting.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     context.read<ProfileVerficationCubit>().profileVerificationCheck();
@@ -118,29 +266,29 @@ class MoreScreen extends StatelessWidget {
                                 builder: (context) => const CodCashScreen(),
                               ));
                         }),
-                  if (Status == "1")
-                    Moreoptionswidget(
-                        title: "Payout History",
-                        subTitle: "Payments",
-                        onTapFun: () {
-                          Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) =>
-                                    const PayoutHistoryScreen(),
-                              ));
-                        }),
-                  Moreoptionswidget(
-                      title: "Refer a Friend",
-                      subTitle: "Refering",
-                      onTapFun: () {
-                        Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (context) =>
-                                  const ReferalEarningsScreen(),
-                            ));
-                      }),
+                  // if (Status == "1")
+                  //   Moreoptionswidget(
+                  //       title: "Payout History",
+                  //       subTitle: "Payments",
+                  //       onTapFun: () {
+                  //         Navigator.push(
+                  //             context,
+                  //             CupertinoPageRoute(
+                  //               builder: (context) =>
+                  //                   const PayoutHistoryScreen(),
+                  //             ));
+                  //       }),
+                  // Moreoptionswidget(
+                  //     title: "Refer a Friend",
+                  //     subTitle: "Refering",
+                  //     onTapFun: () {
+                  //       Navigator.push(
+                  //           context,
+                  //           CupertinoPageRoute(
+                  //             builder: (context) =>
+                  //                 const ReferalEarningsScreen(),
+                  //           ));
+                  //     }),
                   Moreoptionswidget(
                       title: "Help and Support",
                       subTitle: "Help",
@@ -173,6 +321,12 @@ class MoreScreen extends StatelessWidget {
                               builder: (context) => TermsAndConditionsScreen(
                                   title: 'Privacy Policy'),
                             ));
+                      }),
+                  Moreoptionswidget(
+                      title: "Delete Account",
+                      subTitle: "",
+                      onTapFun: () {
+                        confirmDeleteDialog();
                       }),
                   Moreoptionswidget(
                       title: "Logout",

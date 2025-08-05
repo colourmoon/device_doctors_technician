@@ -1,5 +1,5 @@
 class ApiEndPoints {
-  static const String servergUrl = 'https://demo74.colormoon.in/device_doctors/api/';
+  static const String servergUrl = 'https://devicedoctors.in/api/';
   final String kycUpdate = 'homeservices/vendor/register/update_kyc';
   final String registration_endpoint = "homeservices/vendor/Register";
   final String categories_endpoint = "homeservices/vendor/categories";

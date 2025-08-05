@@ -1,14 +1,20 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../../../../comman/Api/Base-Api.dart';
 import '../../../../../comman/Api/end_points.dart';
 import '../../../../../utility/auth_shared_pref.dart';
 import '../../../../commons/common_toast.dart';
+import '../../../../services_bottombar/screen/services_bottombar_screen.dart';
 import '../../model/service_details_model.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart' as dio;
 import 'package:dio/dio.dart';
+
+import '../../screen/service_details_screen.dart';
 part 'service_details_state.dart';
 
 class ServiceDetailsCubit extends Cubit<ServiceDetailsState> {
@@ -203,8 +209,13 @@ class ServiceDetailsCubit extends Cubit<ServiceDetailsState> {
   }
 
   // complete service
-  completeOrder({required String orderId, required String reason, required String otp}) async {
-    emit(state.copyWith(isStatusLoading: true,reachedSuccesss: ''));
+  completeOrder(
+      {required String orderId,
+      required String reason,
+          Function()? success,
+      required BuildContext context,
+      required String otp}) async {
+    emit(state.copyWith(isStatusLoading: true, reachedSuccesss: ''));
     try {
       Map<String, dynamic> bodyData = {
         "access_token": Constants.prefs?.getString("provider_access_token"),
@@ -220,6 +231,8 @@ class ServiceDetailsCubit extends Cubit<ServiceDetailsState> {
         dynamic res = response.data;
         if (res["err_code"] == "valid") {
           CommonSuccessToastwidget(toastmessage: res["message"]);
+
+          success?.call();
           emit(state.copyWith(
             isStatusLoading: false,
             reachedSuccesss: "success",
@@ -273,5 +286,58 @@ class ServiceDetailsCubit extends Cubit<ServiceDetailsState> {
 
   void updateSelectedOption(String value) {
     emit(state.copyWith(selectedOption: value));
+  }
+}
+
+class OrderPaymentRepository {
+  final ValueNotifier<bool> markCompleteNotifier = ValueNotifier(false);
+  final Dio dio = BaseApi().dioClient();
+
+  Future<bool> completePayAfterService({
+    required BuildContext context,
+    required String accessToken,
+    required String orderId,
+    required String paymentType, // 'cash' or 'online'
+  }) async {
+    markCompleteNotifier.value = true;
+
+    try {
+      final response = await dio.post(
+          'homeservices/vendor/orders/complete_pay_after_service',
+          data: await FormData.fromMap(
+            {
+              'access_token': accessToken,
+              'order_id': orderId,
+              'payment_type': paymentType,
+            },
+          ));
+
+      final res = response.data;
+
+      if (res['err_code'] == 'valid') {
+        // Navigate to success screen
+        Navigator.pushAndRemoveUntil(
+          context,
+          CupertinoPageRoute(
+            builder: (context) =>
+                const ServicesBottomBarScreen(initialIndex: 1),
+          ),
+          (route) => false,
+        );
+
+        markCompleteNotifier.value = false;
+        return true;
+      } else {
+        Fluttertoast.showToast(msg: res['message'] ?? 'Unknown error');
+        print("Failed: ${res['message'] ?? 'Unknown error'}");
+        markCompleteNotifier.value = false;
+        return false;
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: 'Error: ${e.toString()}');
+      print("Exception occurred: $e");
+      markCompleteNotifier.value = false;
+      return false;
+    }
   }
 }

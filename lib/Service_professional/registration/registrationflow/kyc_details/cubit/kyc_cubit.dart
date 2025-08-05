@@ -20,8 +20,11 @@ class KycCubit extends Cubit<KycState> {
       ));
       FormData formData = FormData.fromMap({
         'access_token': Constants.prefs?.getString("provider_access_token"),
+        if(adhaarCardFront != 'null')
         'adhaar_card_front': adhaarCardFront,
+        if(adhaarCardBack != 'null')
         'adhaar_card_back': adhaarCardBack,
+        if(panCard != 'null')
         'pan_card': panCard
       });
       final dio = BaseApi().dioClient();

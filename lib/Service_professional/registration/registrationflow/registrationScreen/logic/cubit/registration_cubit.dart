@@ -28,23 +28,21 @@ class RegistrationCubit extends Cubit<RegistrationState> {
           .then((response) {
         dynamic res = response.data;
         if (res["err_code"] == "valid") {
-          print("${ApiEndPoints().registration_endpoint} responce: ${res}");
-          print(
-              "loading state i registration 00: ${state.registrationLoading}");
-
           emit(state.copyWith(
               registrationLoading: false, registrationSuccess: "valid"));
-          print(
-              "loading state i registration 11: ${state.registrationLoading}");
+          emit(state.copyWith(
+              registrationLoading: false, registrationfailed: '',registrationSuccess:''));
         } else {
           emit(state.copyWith(
-              registrationLoading: false, registrationfailed: res["message"]));
-
-          print("${ApiEndPoints().registration_endpoint} responce: ${res}");
+              registrationLoading: false, registrationfailed: res["message"],registrationSuccess:''));
+          emit(state.copyWith(
+              registrationLoading: false, registrationfailed: '',registrationSuccess:''));
         }
       });
     } catch (e) {
       CommonToastwidget(toastmessage: e.toString());
+      emit(state.copyWith(
+          registrationLoading: false, registrationfailed: '',registrationSuccess:''));
       print(e);
       if (e is DioException) {
         if (e.response?.statusCode == 500) {
