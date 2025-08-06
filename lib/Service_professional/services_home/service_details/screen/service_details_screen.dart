@@ -232,7 +232,6 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                             serviceId = item.id;
                           }
                         }
-                        serviceDetails.serviceItems.first.id;
 
                         Navigator.push(
                             context,
@@ -242,8 +241,8 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                 orderId: widget.orderId,
                                 paymentMode: state.serviceDetails?.paymentMode ?? "",
                                 serviceId: serviceId ??
-                                    serviceDetails.serviceItems.first.id,
-                                totalamount: '',
+                                    '',
+                                totalamount: '', costAmount: 0,
                               ),
                             ));
                       },
@@ -283,7 +282,8 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                   type: "details",
                                   total: serviceDetails.visitAndQuotePrice,
                                   orderId: serviceDetails.id,
-                                  serviceId: serviceId ?? "", paymentMode:  state.serviceDetails?.paymentMode ?? "",
+                                  serviceId: serviceId ??
+                                      '', paymentMode:  state.serviceDetails?.paymentMode ?? "",
                                 ),
                               ));
                           // bottomSheet();
@@ -324,9 +324,11 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         isLoading: state.isStatusLoading,
                         onButtonDragged: () {
                           String? serviceId;
+                        bool visitAndQuote = false;
                           for (var item in serviceDetails.serviceItems) {
                             if (item.hasVisitAndQuote == "yes") {
                               serviceId = item.id;
+                              visitAndQuote = true;
                             }
                           }
                           Navigator.push(
@@ -336,6 +338,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                   orderId: serviceDetails.id,
                                   serviceId: serviceId ?? "",
                                   serviceItems: [],
+                                  costAmount: visitAndQuote?double.tryParse('${serviceDetails.grandTotal ?? "0.00"}') ?? 0.00:0.00,
                                   totalamount: "", paymentMode: state.serviceDetails?.paymentMode ?? "",
                                 ),
                               ));
@@ -464,6 +467,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     visitnquotetotal: serviceDetails.visitAndQuotePrice,
                     lat: serviceDetails.custLatitude,
                     long: serviceDetails.custLongitude,
+                    paymentType: serviceDetails.paymentType,
                     vistAndQuoteList: serviceDetails.visitAndQuote,
                     taxesList: serviceDetails.taxes,
                     orderStatus: widget.orderStatus,

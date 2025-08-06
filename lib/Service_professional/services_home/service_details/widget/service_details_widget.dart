@@ -219,6 +219,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
       grand_total,
       payment_mode,
       serialNno,
+      paymentType,
       sub_total,
       taxPercentage,
       long,
@@ -256,6 +257,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
       required this.vistAndQuoteList,
       required this.lat,
       required this.long,
+      required this.paymentType,
       required this.visitnquotetotal,
       required this.tipAmount,
       required this.couponCode,
@@ -444,178 +446,178 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
           10.ph,
           if (vistAndQuoteList.isNotEmpty)
             dottedLine,
-          if (vistAndQuoteList.isNotEmpty)
+          // if (vistAndQuoteList.isNotEmpty)
 
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(left: 15, right: 15, top: 15),
-                      child: CommonProximaNovaTextWidget(
-                        text: "Service Details",
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    5.ph,
-                    for (int i = 0; i < vistAndQuoteList.length; i++)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 15,
-                          right: 15,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            RichText(
-                              text: TextSpan(
-                                // Note: Styles for TextSpans must be explicitly defined.
-                                // Child text spans will inherit styles from parent
-                                style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontFamily: AppthemeColor().themeFont,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w400),
-                                children: <TextSpan>[
-                                  TextSpan(text: 'Service ${i + 1} : '),
-                                  TextSpan(
-                                      text:
-                                          '${vistAndQuoteList[i].serviceName}',
-                                      style: TextStyle(
-                                          fontFamily: AppthemeColor().themeFont,
-                                          fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                            ),
-                            8.ph,
-                            RichText(
-                              text: TextSpan(
-                                // Note: Styles for TextSpans must be explicitly defined.
-                                // Child text spans will inherit styles from parent
-                                style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontFamily: AppthemeColor().themeFont,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w400),
-                                children: <TextSpan>[
-                                  const TextSpan(text: 'Cost : '),
-                                  TextSpan(
-                                      text: '₹ ${vistAndQuoteList[i].price}',
-                                      style: TextStyle(
-                                          fontFamily: AppthemeColor().themeFont,
-                                          fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                            ),
-                            if (vistAndQuoteList[i].serialNumber != null &&
-                                vistAndQuoteList[i].serialNumber.isNotEmpty ==
-                                    true)
-                              8.ph,
-                            if (vistAndQuoteList[i].serialNumber != null &&
-                                vistAndQuoteList[i].serialNumber.isNotEmpty ==
-                                    true)
-                              RichText(
-                                text: TextSpan(
-                                  // Note: Styles for TextSpans must be explicitly defined.
-                                  // Child text spans will inherit styles from parent
-                                  style: TextStyle(
-                                      fontSize: 14.0,
-                                      fontFamily: AppthemeColor().themeFont,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w400),
-                                  children: <TextSpan>[
-                                    const TextSpan(text: 'Serial Number : '),
-                                    TextSpan(
-                                        text: vistAndQuoteList[i].serialNumber,
-                                        style: TextStyle(
-                                            fontFamily:
-                                                AppthemeColor().themeFont,
-                                            fontWeight: FontWeight.w600)),
-                                  ],
-                                ),
-                              ),
-                            if (vistAndQuoteList[i].warrantyDays != null &&
-                                vistAndQuoteList[i].warrantyDays.isNotEmpty ==
-                                    true)
-                              8.ph,
-                            if (vistAndQuoteList[i].warrantyDays != null &&
-                                vistAndQuoteList[i].warrantyDays.isNotEmpty ==
-                                    true)
-                              RichText(
-                                text: TextSpan(
-                                  // Note: Styles for TextSpans must be explicitly defined.
-                                  // Child text spans will inherit styles from parent
-                                  style: TextStyle(
-                                      fontSize: 14.0,
-                                      fontFamily: AppthemeColor().themeFont,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w400),
-                                  children: <TextSpan>[
-                                    const TextSpan(text: 'Warranty Days : '),
-                                    TextSpan(
-                                        text: vistAndQuoteList[i].warrantyDays,
-                                        style: TextStyle(
-                                            fontFamily:
-                                                AppthemeColor().themeFont,
-                                            fontWeight: FontWeight.w600)),
-                                  ],
-                                ),
-                              ),
-                            if (vistAndQuoteList[i].warrantyDays != null &&
-                                vistAndQuoteList[i].warrantyDays.isNotEmpty ==
-                                    true)
-                              8.ph,
-                          ],
-                        ),
-                      ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 15),
-                      child: CustomPaint(
-                        painter: DottedLinePainter(),
-                        child: const SizedBox(
-                          width: double.infinity,
-                          height: 1.0,
-                        ),
-                      ),
-                    ),
-                    4.ph,
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 15, right: 15, bottom: 8),
-                      child: RichText(
-                        text: TextSpan(
-                          // Note: Styles for TextSpans must be explicitly defined.
-                          // Child text spans will inherit styles from parent
-                          style: TextStyle(
-                              fontSize: 14.0,
-                              fontFamily: AppthemeColor().themeFont,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600),
-                          children: <TextSpan>[
-                            const TextSpan(text: 'Total Bill Amount : '),
-                            TextSpan(
-                                text: '₹ ${visitnquotetotal}',
-                                style: TextStyle(
-                                    fontFamily: AppthemeColor().themeFont,
-                                    fontWeight: FontWeight.w700)),
-                          ],
-                        ),
-                      ),
-                    ),
-                    8.ph
-                  ],
-                ),
-              ),
-            ),
+            // Container(
+            //   margin: const EdgeInsets.symmetric(horizontal: 4),
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(8),
+            //   ),
+            //   child: SizedBox(
+            //     width: double.infinity,
+            //     child: Column(
+            //       crossAxisAlignment: CrossAxisAlignment.start,
+            //       children: [
+            //         const Padding(
+            //           padding: EdgeInsets.only(left: 15, right: 15, top: 15),
+            //           child: CommonProximaNovaTextWidget(
+            //             text: "Service Details",
+            //             color: Colors.black,
+            //             fontSize: 12,
+            //             fontWeight: FontWeight.w600,
+            //           ),
+            //         ),
+            //         5.ph,
+            //         for (int i = 0; i < vistAndQuoteList.length; i++)
+            //           Padding(
+            //             padding: const EdgeInsets.only(
+            //               left: 15,
+            //               right: 15,
+            //             ),
+            //             child: Column(
+            //               crossAxisAlignment: CrossAxisAlignment.start,
+            //               children: [
+            //                 RichText(
+            //                   text: TextSpan(
+            //                     // Note: Styles for TextSpans must be explicitly defined.
+            //                     // Child text spans will inherit styles from parent
+            //                     style: TextStyle(
+            //                         fontSize: 14.0,
+            //                         fontFamily: AppthemeColor().themeFont,
+            //                         color: Colors.black,
+            //                         fontWeight: FontWeight.w400),
+            //                     children: <TextSpan>[
+            //                       TextSpan(text: 'Service ${i + 1} : '),
+            //                       TextSpan(
+            //                           text:
+            //                               '${vistAndQuoteList[i].serviceName}',
+            //                           style: TextStyle(
+            //                               fontFamily: AppthemeColor().themeFont,
+            //                               fontWeight: FontWeight.w600)),
+            //                     ],
+            //                   ),
+            //                 ),
+            //                 8.ph,
+            //                 RichText(
+            //                   text: TextSpan(
+            //                     // Note: Styles for TextSpans must be explicitly defined.
+            //                     // Child text spans will inherit styles from parent
+            //                     style: TextStyle(
+            //                         fontSize: 14.0,
+            //                         fontFamily: AppthemeColor().themeFont,
+            //                         color: Colors.black,
+            //                         fontWeight: FontWeight.w400),
+            //                     children: <TextSpan>[
+            //                       const TextSpan(text: 'Cost : '),
+            //                       TextSpan(
+            //                           text: '₹ ${vistAndQuoteList[i].price}',
+            //                           style: TextStyle(
+            //                               fontFamily: AppthemeColor().themeFont,
+            //                               fontWeight: FontWeight.w600)),
+            //                     ],
+            //                   ),
+            //                 ),
+            //                 if (vistAndQuoteList[i].serialNumber != null &&
+            //                     vistAndQuoteList[i].serialNumber.isNotEmpty ==
+            //                         true)
+            //                   8.ph,
+            //                 if (vistAndQuoteList[i].serialNumber != null &&
+            //                     vistAndQuoteList[i].serialNumber.isNotEmpty ==
+            //                         true)
+            //                   RichText(
+            //                     text: TextSpan(
+            //                       // Note: Styles for TextSpans must be explicitly defined.
+            //                       // Child text spans will inherit styles from parent
+            //                       style: TextStyle(
+            //                           fontSize: 14.0,
+            //                           fontFamily: AppthemeColor().themeFont,
+            //                           color: Colors.black,
+            //                           fontWeight: FontWeight.w400),
+            //                       children: <TextSpan>[
+            //                         const TextSpan(text: 'Serial Number : '),
+            //                         TextSpan(
+            //                             text: vistAndQuoteList[i].serialNumber,
+            //                             style: TextStyle(
+            //                                 fontFamily:
+            //                                     AppthemeColor().themeFont,
+            //                                 fontWeight: FontWeight.w600)),
+            //                       ],
+            //                     ),
+            //                   ),
+            //                 if (vistAndQuoteList[i].warrantyDays != null &&
+            //                     vistAndQuoteList[i].warrantyDays.isNotEmpty ==
+            //                         true)
+            //                   8.ph,
+            //                 if (vistAndQuoteList[i].warrantyDays != null &&
+            //                     vistAndQuoteList[i].warrantyDays.isNotEmpty ==
+            //                         true)
+            //                   RichText(
+            //                     text: TextSpan(
+            //                       // Note: Styles for TextSpans must be explicitly defined.
+            //                       // Child text spans will inherit styles from parent
+            //                       style: TextStyle(
+            //                           fontSize: 14.0,
+            //                           fontFamily: AppthemeColor().themeFont,
+            //                           color: Colors.black,
+            //                           fontWeight: FontWeight.w400),
+            //                       children: <TextSpan>[
+            //                         const TextSpan(text: 'Warranty Days : '),
+            //                         TextSpan(
+            //                             text: vistAndQuoteList[i].warrantyDays,
+            //                             style: TextStyle(
+            //                                 fontFamily:
+            //                                     AppthemeColor().themeFont,
+            //                                 fontWeight: FontWeight.w600)),
+            //                       ],
+            //                     ),
+            //                   ),
+            //                 if (vistAndQuoteList[i].warrantyDays != null &&
+            //                     vistAndQuoteList[i].warrantyDays.isNotEmpty ==
+            //                         true)
+            //                   8.ph,
+            //               ],
+            //             ),
+            //           ),
+            //         Padding(
+            //           padding: const EdgeInsets.symmetric(
+            //               vertical: 8, horizontal: 15),
+            //           child: CustomPaint(
+            //             painter: DottedLinePainter(),
+            //             child: const SizedBox(
+            //               width: double.infinity,
+            //               height: 1.0,
+            //             ),
+            //           ),
+            //         ),
+            //         4.ph,
+            //         Padding(
+            //           padding:
+            //               const EdgeInsets.only(left: 15, right: 15, bottom: 8),
+            //           child: RichText(
+            //             text: TextSpan(
+            //               // Note: Styles for TextSpans must be explicitly defined.
+            //               // Child text spans will inherit styles from parent
+            //               style: TextStyle(
+            //                   fontSize: 14.0,
+            //                   fontFamily: AppthemeColor().themeFont,
+            //                   color: Colors.black,
+            //                   fontWeight: FontWeight.w600),
+            //               children: <TextSpan>[
+            //                 const TextSpan(text: 'Total Bill Amount : '),
+            //                 TextSpan(
+            //                     text: '₹ ${visitnquotetotal}',
+            //                     style: TextStyle(
+            //                         fontFamily: AppthemeColor().themeFont,
+            //                         fontWeight: FontWeight.w700)),
+            //               ],
+            //             ),
+            //           ),
+            //         ),
+            //         8.ph
+            //       ],
+            //     ),
+            //   ),
+            // ),
         ],
       );
     }
@@ -932,7 +934,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                       //           .paymentMode),
                       // ),
 
-
+                        if(payment_mode !='Paid')
                       Padding(
                         padding: const EdgeInsets.only(
                             left: 10, right: 10, top: 0),
@@ -948,11 +950,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                                   fontWeight: FontWeight.w500),
                             ),
                             CommonProximaNovaTextWidget(
-                              text: payment_mode
-                                  ?.toLowerCase() !=
-                                  'cod'
-                                  ? 'Paid'
-                                  : 'Pending',
+                              text: billDetails?.paymentStatus ??'',
                               fontSize: 14,
                               color:
                               ApplicationColours.blackColor,
@@ -1041,38 +1039,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                           ),
                         ),
 
-                      if (double.parse(wallet_part_payment
-                          .toString()
-                          .replaceAll(',', '')) >
-                          0)
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              bottom: 0,
-                              left: 10,
-                              right: 10,
-                              top: 2),
-                          child: Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
-                            children: [
-                              const CommonProximaNovaTextWidget(
-                                text: 'Used Wallet Amount',
-                                fontSize: 12,
-                                color:
-                                ApplicationColours.blackColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              CommonProximaNovaTextWidget(
-                                text:
-                                '- ₹ ${wallet_part_payment}',
-                                fontSize: 14,
-                                color:
-                                ApplicationColours.blackColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ],
-                          ),
-                        )else
+
 
                           Padding(
                             padding: const EdgeInsets.only(
@@ -1082,7 +1049,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                               MainAxisAlignment.spaceBetween,
                               children: [
                                 const CommonProximaNovaTextWidget(
-                                  text: "Online Paid",
+                                  text: "Online/Wallet",
                                   fontSize: 12,
                                   color:
                                   ApplicationColours.blackColor,
@@ -1343,7 +1310,6 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
             else ...[
               if (status !=
                   "Cancelled")
-
                 Padding(
                   padding: const EdgeInsets.only(left: 15, right: 15, top: 0),
                   child: Row(
@@ -1480,6 +1446,10 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                           ],
                         ),
                       ),
+            if(paymentType !='Paid')...[
+
+            ],
+
 
                       Padding(
                         padding: const EdgeInsets.only(
@@ -1509,7 +1479,6 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                           ],
                         ),
                       ),
-
                       if (double.parse(tipAmount
                           .toString()
                           .replaceAll(',', '')) >
@@ -1539,38 +1508,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                             ],
                           ),
                         ),
-                      if (double.parse(wallet_part_payment
-                          .toString()
-                          .replaceAll(',', '')) >
-                          0)
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              bottom: 0,
-                              left: 10,
-                              right: 10,
-                              top: 2),
-                          child: Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
-                            children: [
-                              const CommonProximaNovaTextWidget(
-                                text: 'Used Wallet Amount',
-                                fontSize: 12,
-                                color:
-                                ApplicationColours.blackColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              CommonProximaNovaTextWidget(
-                                text:
-                                '- ₹ ${wallet_part_payment}',
-                                fontSize: 14,
-                                color:
-                                ApplicationColours.blackColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ],
-                          ),
-                        ),
+
                       // if (double.parse(bookingState
                       //         .serviceOrderViewData!
                       //         .data!

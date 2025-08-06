@@ -355,7 +355,7 @@ class ReviewQuoteScreen extends StatelessWidget {
                         serviceItems: ServiceItems,
                         orderId: orderId,
                         serviceId: serviceId,
-                        totalamount: totalAmount, paymentMode:  paymentMode,
+                        totalamount: totalAmount, paymentMode:  paymentMode, costAmount: 0,
                       ),
                     ));
               },

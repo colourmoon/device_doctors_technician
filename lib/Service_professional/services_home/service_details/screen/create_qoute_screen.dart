@@ -19,11 +19,13 @@ import 'review_quote_screen.dart';
 class CreateQuoteScreen extends StatefulWidget {
   final orderId, serviceId, totalamount;
   final paymentMode;
+  final double costAmount;
   final List<VisitAndQuote> serviceItems;
   const CreateQuoteScreen(
       {super.key,
       required this.orderId,
       required this.paymentMode,
+      required this.costAmount,
       required this.serviceId,
       required this.serviceItems,
       required this.totalamount});
@@ -42,7 +44,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
   }
 
   List<jsonModel> formDataList = [];
-  void submitForms() {
+  void submitForms() async{
     formDataList.clear(); // Make sure list is fresh
 
     for (MyForm form in formWidgets) {
@@ -68,11 +70,36 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
         CommonToastwidget(toastmessage: "Please fill the details");
       });
     } else {
-      context.read<SendQuoteCubit>().addquoate(
-        orderId: widget.orderId ??"",
-        serviceId: widget.serviceId ??"",
-        servicesList: formDataList ??[],
-      );
+
+      double amountList = 0.0;
+
+      try {
+        amountList = formDataList.fold(0.0, (total, e) {
+          final parsedAmount = double.tryParse('${e.amount ?? '0.00'}') ?? 0.0;
+          return total + parsedAmount;
+        });
+
+        if (amountList <= widget.costAmount) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            CommonToastwidget(
+              toastmessage: "You cannot enter an amount less than or equal to the visit amount.",
+            );
+            return;
+          });
+        }else{
+          context.read<SendQuoteCubit>().addquoate(
+            orderId: widget.orderId ??"",
+            serviceId: widget.serviceId ??"",
+            servicesList: formDataList ??[],
+          );
+        }
+      } catch (e) {
+        print('Error calculating total amount: $e');
+        amountList = 0.0;
+      }
+
+
+
     }
   }
 
@@ -265,6 +292,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
             listener: (context, state) {
               if (state is AddQuotesuccess) {
                 if (widget.serviceItems.isEmpty) {
+
                   context
                       .read<NewOrdersCubit>()
                       .fetchNewOrders(type: "ongoing");
