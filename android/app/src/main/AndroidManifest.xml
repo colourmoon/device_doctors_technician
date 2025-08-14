@@ -18,7 +18,7 @@
     <application
         android:enableOnBackInvokedCallback="true"
 
-        android:label="Device Doctors Technician"
+        android:label="DeviceDoctors Technician"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

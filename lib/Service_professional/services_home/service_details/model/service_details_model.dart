@@ -45,6 +45,7 @@ class ServiceDetailsModel {
   String isQuote;
   String? device_brand;
   String? sub_total;
+  String? booking_payment_status;
   String? taxPercentage;
   String? wallet_part_payment;
   String? model_name;
@@ -79,6 +80,7 @@ class ServiceDetailsModel {
     required this.is_vendor_update_device_details,
     required this.subTotal,
     this.is_rescheduled = '',
+    this.booking_payment_status = '',
     this.is_pay_after_service = '',
     required this.grandTotal,
     required this.serviceDate,
@@ -120,6 +122,7 @@ class ServiceDetailsModel {
             json["is_vendor_update_device_details"],
         device_type: json["device_type"],
         device_id: json["device_id"],
+        booking_payment_status: json["booking_payment_status"],
         wallet_part_payment: json["wallet_part_payment"],
         billDetails: json['bill_details'] != null
             ? new BillDetails.fromJson(json['bill_details'])
@@ -179,6 +182,7 @@ class ServiceDetailsModel {
         "service_name": service_name,
         "service_date": serviceDate,
         "device_type": device_type,
+        "booking_payment_status": booking_payment_status,
 
         "tax_percentage": taxPercentage,
         "sub_total": sub_total,
@@ -291,6 +295,7 @@ class VisitAndQuote {
   String serviceName;
   String price;
   String sub_total;
+  String tax_amount;
   String serialNumber;
   String warrantyDays;
 
@@ -298,6 +303,7 @@ class VisitAndQuote {
     required this.id,
     required this.serviceName,
     required this.price,
+    required this.tax_amount,
     required this.sub_total,
     required this.serialNumber,
     required this.warrantyDays,
@@ -307,6 +313,7 @@ class VisitAndQuote {
         id: json["id"],
         serviceName: json["service_name"],
         price: json["price"],
+    tax_amount: json["tax_amount"],
     sub_total: json["sub_total"],
         serialNumber: json["serial_number"] ?? '',
         warrantyDays: json["warrenty_days"] ?? '',
@@ -315,6 +322,7 @@ class VisitAndQuote {
   Map<String, dynamic> toJson() => {
         "id": id,
         "service_name": serviceName,
+        "tax_amount": tax_amount,
         "price": price,
         "sub_total": sub_total,
         "serial_number": serialNumber,

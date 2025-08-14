@@ -220,6 +220,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
       payment_mode,
       serialNno,
       paymentType,
+      booking_payment_status,
       sub_total,
       taxPercentage,
       long,
@@ -251,6 +252,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
       required this.is_vendor_update_device_details,
       required this.is_amc_subscription,
       required this.service_name,
+      required this.booking_payment_status,
       required this.wallet_part_payment,
       this.orderStatus = '',
       required this.taxesList,
@@ -416,8 +418,199 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                   description: customerAddress)
               .symmetric(horizontal: 22),
           5.ph,
-          dottedLine,
-          5.ph,
+          if (billDetails?.visitAndQuote?.isNotEmpty == true)
+            dottedLine,
+          if (billDetails?.visitAndQuote?.isNotEmpty == true)
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 15, right: 15, top: 15),
+                      child: CommonProximaNovaTextWidget(
+                        text: "Service Details",
+                        color: Colors.black,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    5.ph,
+                    for (int i = 0; i < (billDetails?.visitAndQuote?.length ??0); i++)
+                      if (billDetails?.visitAndQuote?.isNotEmpty  == true)
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 15,
+                            right: 15,
+                            bottom: 10
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  // Note: Styles for TextSpans must be explicitly defined.
+                                  // Child text spans will inherit styles from parent
+                                  style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontFamily: AppthemeColor().themeFont,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w400),
+                                  children: <TextSpan>[
+                                    TextSpan(text: 'Service ${i + 1} : '),
+                                    TextSpan(
+                                        text:
+                                        '${billDetails?.visitAndQuote?[i].serviceName}',
+                                        style: TextStyle(
+                                            fontFamily: AppthemeColor().themeFont,
+                                            fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
+                              ),
+                              8.ph,
+                              RichText(
+                                text: TextSpan(
+                                  // Note: Styles for TextSpans must be explicitly defined.
+                                  // Child text spans will inherit styles from parent
+                                  style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontFamily: AppthemeColor().themeFont,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w400),
+                                  children: <TextSpan>[
+                                    const TextSpan(text: 'Cost : '),
+                                    TextSpan(
+                                        text: '₹ ${billDetails?.visitAndQuote?[i].sub_total}',
+                                        style: TextStyle(
+                                            fontFamily: AppthemeColor().themeFont,
+                                            fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
+                              ),
+                              if (billDetails?.taxPercentage  != null &&
+                                  billDetails?.taxAmount?.isNotEmpty ==
+                                      true)
+                                8.ph,
+                              if (billDetails?.taxPercentage  != null &&
+                                  billDetails?.taxAmount?.isNotEmpty ==
+                                      true)
+                                RichText(
+                                  text: TextSpan(
+                                    // Note: Styles for TextSpans must be explicitly defined.
+                                    // Child text spans will inherit styles from parent
+                                    style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontFamily: AppthemeColor().themeFont,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w400),
+                                    children: <TextSpan>[
+                                      TextSpan(text: 'Tax (${billDetails?.taxPercentage}%) : '),
+                                      TextSpan(
+                                          text: '₹ ${billDetails?.visitAndQuote?[i]?.tax_amount}',
+                                          style: TextStyle(
+                                              fontFamily:
+                                              AppthemeColor().themeFont,
+                                              fontWeight: FontWeight.w600)),
+                                    ],
+                                  ),
+                                ),
+                              if (billDetails?.visitAndQuote?[i].serialNumber != null &&
+                                  billDetails?.visitAndQuote?[i].serialNumber.isNotEmpty ==
+                                      true)
+                                8.ph,
+                              if (billDetails?.visitAndQuote?[i].serialNumber != null &&
+                                  billDetails?.visitAndQuote?[i].serialNumber.isNotEmpty ==
+                                      true)
+                                RichText(
+                                  text: TextSpan(
+                                    // Note: Styles for TextSpans must be explicitly defined.
+                                    // Child text spans will inherit styles from parent
+                                    style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontFamily: AppthemeColor().themeFont,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w400),
+                                    children: <TextSpan>[
+                                      const TextSpan(text: 'Serial Number : '),
+                                      TextSpan(
+                                          text: vistAndQuoteList[i].serialNumber,
+                                          style: TextStyle(
+                                              fontFamily:
+                                              AppthemeColor().themeFont,
+                                              fontWeight: FontWeight.w600)),
+                                    ],
+                                  ),
+                                ),
+
+
+
+
+                              if (billDetails?.visitAndQuote?[i].warrantyDays != null &&
+                                  billDetails?.visitAndQuote?[i].warrantyDays.isNotEmpty ==
+                                      true)
+                                8.ph,
+                              if (billDetails?.visitAndQuote?[i].warrantyDays != null &&
+                                  billDetails?.visitAndQuote?[i].warrantyDays.isNotEmpty ==
+                                      true)
+                                RichText(
+                                  text: TextSpan(
+                                    // Note: Styles for TextSpans must be explicitly defined.
+                                    // Child text spans will inherit styles from parent
+                                    style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontFamily: AppthemeColor().themeFont,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w400),
+                                    children: <TextSpan>[
+                                      const TextSpan(text: 'Warranty Days : '),
+                                      TextSpan(
+                                          text: billDetails?.visitAndQuote?[i].warrantyDays,
+                                          style: TextStyle(
+                                              fontFamily:
+                                              AppthemeColor().themeFont,
+                                              fontWeight: FontWeight.w600)),
+                                    ],
+                                  ),
+                                ),
+                              8.ph,
+                              dottedLine,
+                            ],
+                          ),
+                        ),
+
+                    // Padding(
+                    //   padding:
+                    //       const EdgeInsets.only(left: 15, right: 15, bottom: 8),
+                    //   child: RichText(
+                    //     text: TextSpan(
+                    //       // Note: Styles for TextSpans must be explicitly defined.
+                    //       // Child text spans will inherit styles from parent
+                    //       style: TextStyle(
+                    //           fontSize: 14.0,
+                    //           fontFamily: AppthemeColor().themeFont,
+                    //           color: Colors.black,
+                    //           fontWeight: FontWeight.w600),
+                    //       children: <TextSpan>[
+                    //         const TextSpan(text: 'Total Bill Amount : '),
+                    //         TextSpan(
+                    //             text: '₹ ${visitnquotetotal}',
+                    //             style: TextStyle(
+                    //                 fontFamily: AppthemeColor().themeFont,
+                    //                 fontWeight: FontWeight.w700)),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+                  ],
+                ),
+              ),
+            ),
+
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
             child: Row(
@@ -1466,11 +1659,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                                   fontWeight: FontWeight.w500),
                             ),
                             CommonProximaNovaTextWidget(
-                              text: payment_mode
-                                  ?.toLowerCase() !=
-                                  'cod'
-                                  ? 'Paid'
-                                  : 'Pending',
+                              text: booking_payment_status,
                               fontSize: 14,
                               color:
                               ApplicationColours.blackColor,
@@ -1586,9 +1775,6 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
                         ),
                       ),
                       14.ph,
-
-
-
                       Padding(
                         padding: const EdgeInsets.only(
                             left: 10,
@@ -1624,181 +1810,7 @@ class ServiceDetailsFullDetailsWidget extends StatelessWidget {
           ],
         ),
 
-        // 10.ph,
-        // if (vistAndQuoteList.isNotEmpty)
-        //   dottedLine,
-        // if (vistAndQuoteList.isNotEmpty)
-        //   Container(
-        //     margin: const EdgeInsets.symmetric(horizontal: 4),
-        //     decoration: BoxDecoration(
-        //       borderRadius: BorderRadius.circular(8),
-        //     ),
-        //     child: SizedBox(
-        //       width: double.infinity,
-        //       child: Column(
-        //         crossAxisAlignment: CrossAxisAlignment.start,
-        //         children: [
-        //           const Padding(
-        //             padding: EdgeInsets.only(left: 15, right: 15, top: 15),
-        //             child: CommonProximaNovaTextWidget(
-        //               text: "Service Details",
-        //               color: Colors.black,
-        //               fontSize: 12,
-        //               fontWeight: FontWeight.w600,
-        //             ),
-        //           ),
-        //           5.ph,
-        //           for (int i = 0; i < vistAndQuoteList.length; i++)
-        //             if (vistAndQuoteList.isNotEmpty )
-        //               Padding(
-        //                 padding: const EdgeInsets.only(
-        //                   left: 15,
-        //                   right: 15,
-        //                 ),
-        //                 child: Column(
-        //                   crossAxisAlignment: CrossAxisAlignment.start,
-        //                   children: [
-        //                     RichText(
-        //                       text: TextSpan(
-        //                         // Note: Styles for TextSpans must be explicitly defined.
-        //                         // Child text spans will inherit styles from parent
-        //                         style: TextStyle(
-        //                             fontSize: 14.0,
-        //                             fontFamily: AppthemeColor().themeFont,
-        //                             color: Colors.black,
-        //                             fontWeight: FontWeight.w400),
-        //                         children: <TextSpan>[
-        //                           TextSpan(text: 'Service ${i + 1} : '),
-        //                           TextSpan(
-        //                               text:
-        //                                   '${vistAndQuoteList[i].serviceName}',
-        //                               style: TextStyle(
-        //                                   fontFamily: AppthemeColor().themeFont,
-        //                                   fontWeight: FontWeight.w600)),
-        //                         ],
-        //                       ),
-        //                     ),
-        //                     8.ph,
-        //                     RichText(
-        //                       text: TextSpan(
-        //                         // Note: Styles for TextSpans must be explicitly defined.
-        //                         // Child text spans will inherit styles from parent
-        //                         style: TextStyle(
-        //                             fontSize: 14.0,
-        //                             fontFamily: AppthemeColor().themeFont,
-        //                             color: Colors.black,
-        //                             fontWeight: FontWeight.w400),
-        //                         children: <TextSpan>[
-        //                           const TextSpan(text: 'Cost : '),
-        //                           TextSpan(
-        //                               text: '₹ ${vistAndQuoteList[i].price}',
-        //                               style: TextStyle(
-        //                                   fontFamily: AppthemeColor().themeFont,
-        //                                   fontWeight: FontWeight.w600)),
-        //                         ],
-        //                       ),
-        //                     ),
-        //                     if (vistAndQuoteList[i].serialNumber != null &&
-        //                         vistAndQuoteList[i].serialNumber.isNotEmpty ==
-        //                             true)
-        //                       8.ph,
-        //                     if (vistAndQuoteList[i].serialNumber != null &&
-        //                         vistAndQuoteList[i].serialNumber.isNotEmpty ==
-        //                             true)
-        //                       RichText(
-        //                         text: TextSpan(
-        //                           // Note: Styles for TextSpans must be explicitly defined.
-        //                           // Child text spans will inherit styles from parent
-        //                           style: TextStyle(
-        //                               fontSize: 14.0,
-        //                               fontFamily: AppthemeColor().themeFont,
-        //                               color: Colors.black,
-        //                               fontWeight: FontWeight.w400),
-        //                           children: <TextSpan>[
-        //                             const TextSpan(text: 'Serial Number : '),
-        //                             TextSpan(
-        //                                 text: vistAndQuoteList[i].serialNumber,
-        //                                 style: TextStyle(
-        //                                     fontFamily:
-        //                                         AppthemeColor().themeFont,
-        //                                     fontWeight: FontWeight.w600)),
-        //                           ],
-        //                         ),
-        //                       ),
-        //                     if (vistAndQuoteList[i].warrantyDays != null &&
-        //                         vistAndQuoteList[i].warrantyDays.isNotEmpty ==
-        //                             true)
-        //                       8.ph,
-        //                     if (vistAndQuoteList[i].warrantyDays != null &&
-        //                         vistAndQuoteList[i].warrantyDays.isNotEmpty ==
-        //                             true)
-        //                       RichText(
-        //                         text: TextSpan(
-        //                           // Note: Styles for TextSpans must be explicitly defined.
-        //                           // Child text spans will inherit styles from parent
-        //                           style: TextStyle(
-        //                               fontSize: 14.0,
-        //                               fontFamily: AppthemeColor().themeFont,
-        //                               color: Colors.black,
-        //                               fontWeight: FontWeight.w400),
-        //                           children: <TextSpan>[
-        //                             const TextSpan(text: 'Warranty Days : '),
-        //                             TextSpan(
-        //                                 text: vistAndQuoteList[i].warrantyDays,
-        //                                 style: TextStyle(
-        //                                     fontFamily:
-        //                                         AppthemeColor().themeFont,
-        //                                     fontWeight: FontWeight.w600)),
-        //                           ],
-        //                         ),
-        //                       ),
-        //                     if (vistAndQuoteList[i].warrantyDays != null &&
-        //                         vistAndQuoteList[i].warrantyDays.isNotEmpty ==
-        //                             true)
-        //                       8.ph,
-        //                   ],
-        //                 ),
-        //               ),
-        //           Padding(
-        //             padding:
-        //                 const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
-        //             child: CustomPaint(
-        //               painter: DottedLinePainter(),
-        //               child: const SizedBox(
-        //                 width: double.infinity,
-        //                 height: 1.0,
-        //               ),
-        //             ),
-        //           ),
-        //           4.ph,
-        //           Padding(
-        //             padding:
-        //                 const EdgeInsets.only(left: 15, right: 15, bottom: 8),
-        //             child: RichText(
-        //               text: TextSpan(
-        //                 // Note: Styles for TextSpans must be explicitly defined.
-        //                 // Child text spans will inherit styles from parent
-        //                 style: TextStyle(
-        //                     fontSize: 14.0,
-        //                     fontFamily: AppthemeColor().themeFont,
-        //                     color: Colors.black,
-        //                     fontWeight: FontWeight.w600),
-        //                 children: <TextSpan>[
-        //                   const TextSpan(text: 'Total Bill Amount : '),
-        //                   TextSpan(
-        //                       text: '₹ ${visitnquotetotal}',
-        //                       style: TextStyle(
-        //                           fontFamily: AppthemeColor().themeFont,
-        //                           fontWeight: FontWeight.w700)),
-        //                 ],
-        //               ),
-        //             ),
-        //           ),
-        //           8.ph
-        //         ],
-        //       ),
-        //     ),
-        //   ),
+
       ],
     );
   }

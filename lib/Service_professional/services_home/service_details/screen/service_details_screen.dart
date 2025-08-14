@@ -455,6 +455,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
               child: Column(
                 children: [
                   ServiceDetailsFullDetailsWidget(
+                    booking_payment_status: serviceDetails.booking_payment_status ??"",
                     is_quote: serviceDetails.isQuote,
                     sub_total: serviceDetails.sub_total ??"",
                     taxPercentage: serviceDetails.taxPercentage ??"",
