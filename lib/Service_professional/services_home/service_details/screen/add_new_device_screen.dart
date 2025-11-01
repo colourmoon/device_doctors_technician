@@ -230,67 +230,96 @@ class DeviceTypeDropdown extends StatefulWidget {
 }
 
 class _DeviceTypeDropdownState extends State<DeviceTypeDropdown> {
-  final List<String> _deviceTypes = ['Mac', 'Windows'];
+  @override
+  void initState() {
+    super.initState();
+    context.read<SavedDevicesCubit>().fetchDevice();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      value: widget.selectedValue,
-      hint: const Text(
-        'Select Device',
-        style: TextStyle(
-          color: Color(0xFF222534),
-          fontSize: 14,
-          fontFamily: 'ProximaNova',
-          fontWeight: FontWeight.w400,
-        ),
-      ),
-      decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
-        enabledBorder: OutlineInputBorder(
-            borderSide: const BorderSide(
-                color: ApplicationColours.textFiledColor, width: 1),
-            borderRadius: BorderRadius.circular(12)),
-        floatingLabelBehavior: FloatingLabelBehavior.never,
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(
-                width: 1, color: ApplicationColours.textFiledColor)),
-        errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(
-                width: 1, color: ApplicationColours.textFiledColor)),
-        focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(
-                width: 1, color: ApplicationColours.textFiledColor)),
-        focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(
-                width: 1, color: ApplicationColours.textFiledColor)),
-        labelText: 'Select Device Type',
-      ),
-      icon: const Icon(Icons.keyboard_arrow_down),
-      items: _deviceTypes.map((type) {
-        return DropdownMenuItem<String>(
-          value: type,
-          child: Text(
-            type,
-            style: const TextStyle(
-              color: Color(0xFF222534),
-              fontSize: 14,
-              fontFamily: 'ProximaNova',
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        );
-      }).toList(),
-      onChanged: widget.onChanged,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select a device type';
+    return BlocBuilder<SavedDevicesCubit, SavedDevicesState>(
+      builder: (context, state) {
+        if (state.deviceStatus == ApiStatusState.loading) {
+          return const Center(child: CircularProgressIndicator());
         }
-        return null;
+
+        if (state.deviceStatus == ApiStatusState.error) {
+          return const Text(
+            'Failed to load devices',
+            style: TextStyle(color: Colors.red),
+          );
+        }
+
+        if (state.deviceStatus == ApiStatusState.success &&
+            state.osResponse != null &&
+            state.osResponse!.data.isNotEmpty) {
+
+          final devices = state.osResponse!.data;
+          final deviceNames = devices.map((e) => e.name).toSet().toList();
+
+          // ✅ Ensure selected value exists in the dropdown
+          final validSelectedValue = deviceNames.contains(widget.selectedValue)
+              ? widget.selectedValue
+              : null;
+
+          return DropdownButtonFormField<String>(
+            value: validSelectedValue,
+            hint: const Text(
+              'Select Device',
+              style: TextStyle(
+                color: Color(0xFF222534),
+                fontSize: 14,
+                fontFamily: 'ProximaNova',
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            decoration: InputDecoration(
+              contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
+              enabledBorder: OutlineInputBorder(
+                borderSide: const BorderSide(
+                  color: ApplicationColours.textFiledColor,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              floatingLabelBehavior: FloatingLabelBehavior.never,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  width: 1,
+                  color: ApplicationColours.textFiledColor,
+                ),
+              ),
+              labelText: 'Select Device Type',
+            ),
+            icon: const Icon(Icons.keyboard_arrow_down),
+            items: deviceNames.map((device) {
+              return DropdownMenuItem<String>(
+                value: device,
+                child: Text(
+                  device,
+                  style: const TextStyle(
+                    color: Color(0xFF222534),
+                    fontSize: 14,
+                    fontFamily: 'ProximaNova',
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: widget.onChanged,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please select a device type';
+              }
+              return null;
+            },
+          );
+        }
+
+        return const Text('No devices available');
       },
     );
   }

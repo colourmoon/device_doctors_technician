@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../../../comman/Api/Base-Api.dart';
 import '../../../../utility/auth_shared_pref.dart';
+import '../model/model/os_response.dart';
 import '../model/model/saved_devices_response.dart';
 
 part 'saved_devices_state.dart';
@@ -37,6 +38,33 @@ class SavedDevicesCubit extends Cubit<SavedDevicesState> {
     }
   }
 
+
+
+  Future<void> fetchDevice() async {
+    if (isClosed) return; // Prevent emitting when Cubit is closed
+
+    emit(state.copyWith(deviceStatus: ApiStatusState.loading));
+
+    try {
+      final response = await fetchDeviceResponse();
+
+      if (response.data.isEmpty) {
+        emit(state.copyWith(deviceStatus: ApiStatusState.empty));
+      } else {
+        emit(state.copyWith(
+          osResponse: response,
+          deviceStatus: ApiStatusState.success,
+        ));
+      }
+    } catch (e) {
+      final errorMessage = e.toString().replaceAll('Exception: ', '');
+      Fluttertoast.showToast(msg: errorMessage);
+
+      if (!isClosed) {
+        emit(state.copyWith(deviceStatus: ApiStatusState.error));
+      }
+    }
+  }
   Future<SavedDevicesResponse> fetchSavedDevicesResponse() async {
     try {
       final accesstoken =
@@ -106,6 +134,29 @@ class SavedDevicesCubit extends Cubit<SavedDevicesState> {
     }
   }
 
+
+  Future<OSResponse> fetchDeviceResponse() async {
+    try {
+      final dio = BaseApi().dioClient();
+      final response = await dio.post('customer/devicetypes');
+
+      final data = response.data;
+
+      if (data != null && data['status'] == true) {
+        return OSResponse.fromJson(data);
+      } else {
+        throw Exception(data?['message'] ?? 'Unexpected response from server');
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 500) {
+        throw Exception('Server error. Please try again later.');
+      } else {
+        throw Exception('Unable to fetch device list. Please try again.');
+      }
+    } catch (e) {
+      throw Exception('Something went wrong: $e');
+    }
+  }
   Future<String> addNewDeviceResponse(
     Map<String, dynamic> deviceInfo,
     BuildContext context,
